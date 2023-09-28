@@ -1,0 +1,5 @@
+{
+  "tasks": {
+    "order": "deno run --allow-all main.ts"
+  }
+}
