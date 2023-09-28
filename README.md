@@ -9,7 +9,7 @@ This code is experimental and not intended for production use. I'm uploading thi
 Run at your own risk.
 
 I did start with the new fine-tuning feature, but found better results with a GPT-4 system prompt.
-I am going to revisit fine-tuning in the future, because I lack some understand of the underlying mechanics.
+I am going to revisit fine-tuning in the future, because I lack some understanding of the underlying mechanics.
 
 It starts with the users input
 ```plaintext
