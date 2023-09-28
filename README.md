@@ -180,7 +180,7 @@ The non-minified output is then validated and can be used for further processing
 ]
 ```
 
-The PizzaOrderItem array is then passed into a summary function
+An example of how the output can be used is to generate a funny summary of the order
 ```typescript
 const generatePizzaOrderSummarySystemPrompt = `
 You will be provided with a JSON array of objects that represent a pizza order item. Here is the schema:
