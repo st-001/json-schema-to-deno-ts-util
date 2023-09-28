@@ -13,7 +13,9 @@ I am going to revisit fine-tuning in the future, because I lack some understand 
 
 It starts with the users input
 ```plaintext
-Hey! I wanna order 100 pizzas. all of them should have cheese and ham, except for 2 which only should have cheese
+Hey! I wanna order 100 pizzas. 
+
+all of them should have cheese and ham, except for 2 which only should have cheese
 ```
 
 We need to convert the input into a JSON array containing objects that match the following schema.
@@ -212,7 +214,8 @@ export async function generatePizzaOrderSummary(
 
 Which returns the following (I set the temperature to 1.2 to get some unhinged results)
 ```plaintext
-Wow, you really love cheese and ham on your medium tomato sauce pizza! 🍕🧀🍖 With 98 of them, you must be having a pizza party! Enjoy the cheesy goodness! 🎉😄
+Wow, you really love cheese and ham on your medium tomato sauce pizza! 🍕🧀🍖 
+With 98 of them, you must be having a pizza party! Enjoy the cheesy goodness! 🎉😄
 
 Oh, and for your other order of a medium tomato sauce pizza with just cheese, I hope you enjoy the simple and classic combination! Sometimes less is more, right? 😄🍕🧀
 ```
