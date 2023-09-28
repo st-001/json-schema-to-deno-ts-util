@@ -150,7 +150,7 @@ export interface PizzaOrderItemMinified {
   q: number;
 }
 
-export const systemPrompt = `
+export const generatePizzaOrderSystemPrompt = `
 Convert content you are provided into a JSON array containing objects which must validate against this schema:
 ${JSON.stringify(pizzaOrderItemMinifiedSchema, null, 2)}
 
@@ -164,12 +164,8 @@ The outputted JSON will be used to create a pizza order.
 `;
 
 export async function generatePizzaOrder(content: string) {
-  console.log("Generating pizza order...");
-  console.log()
-  console.log(`Users order: ${content}`)
-  console.log()
   const messages = [
-    { role: "system", content: systemPrompt },
+    { role: "system", content: generatePizzaOrderSystemPrompt },
     { role: "user", content },
   ] as Message[];
 
@@ -182,13 +178,10 @@ export async function generatePizzaOrder(content: string) {
 
   const messageContent = completion.choices[0].message?.content;
 
-  console.log(`OpenAI response: ${messageContent}`)
-
   if (!messageContent) throw new Error("No content received from OpenAI");
 
   const parsedContent: PizzaOrderItemMinified[] = JSON.parse(messageContent);
 
-  // if array is empty, throw an error stating no pizza order items could be found
   if (parsedContent.length === 0) {
     throw new Error("No pizza order items could be found");
   }
@@ -209,17 +202,16 @@ export async function generatePizzaOrder(content: string) {
     }
   }
 
-  console.log("Pizza order JSON: ", JSON.stringify(pizzaOrderItems, null, 2))
-
   return pizzaOrderItems;
 }
 
 const generatePizzaOrderSummarySystemPrompt = `
-You will be provided with a JSON array of pizza order items that follow this schema:
-${JSON.stringify(pizzaOrderItemSchema)}
+You will be provided with a JSON array of objects that represent a pizza order item. Here is the schema:
+${JSON.stringify(pizzaOrderItemSchema, null, 2)}
 
-For each item in the list, provide a short and direct sentence describing the pizza order item.
-Be friendly and make a couple of comments about their pizza order in each sentence.
+For each object in the array, provide a short and direct sentence describing the pizza order item.
+Be friendly and make a couple of comments about their pizza order in each sentence. Use some emojis.
+If they use a funny/strange combination of toppings, make a joke about it.
 `;
 
 export async function generatePizzaOrderSummary(
@@ -233,8 +225,8 @@ export async function generatePizzaOrderSummary(
   const completion = await openai.chat.completions.create({
     messages: messages,
     model: "gpt-3.5-turbo-16k-0613",
-    max_tokens: 1000,
-    temperature: 0.7,
+    max_tokens: 500,
+    temperature: 1.2,
   });
 
   const messageContent = completion.choices[0].message?.content;
