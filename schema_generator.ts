@@ -226,10 +226,10 @@ async function processSchemaFiles() {
     if (!dirEntry.isDirectory) continue; // Skip non-directory entries
     const subSchemaDirPath = `${schemaDir}/${dirEntry.name}`;
     for await (const subDirEntry of Deno.readDir(subSchemaDirPath)) {
-      if (subDirEntry.isFile && subDirEntry.name.endsWith(".ts")) {
+      if (subDirEntry.isFile && subDirEntry.name.endsWith(".json")) {
         const schemaFilePath = `${subSchemaDirPath}/${subDirEntry.name}`;
-        const schemaModule = await import(schemaFilePath);
-        const originalSchema = schemaModule.default;
+        const schemaText = await Deno.readTextFile(schemaFilePath);
+        const originalSchema = JSON.parse(schemaText);
         const propertyKeys = Object.keys(originalSchema.properties);
         const propertyMappingTable = generateMappingTable(propertyKeys);
         const enumMappingTables = generateMappingTables(originalSchema);

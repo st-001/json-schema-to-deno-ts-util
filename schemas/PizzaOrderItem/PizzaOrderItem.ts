@@ -46,7 +46,7 @@
     },
     "toppings": {
       "type": "array",
-      "description": "The list of toppings on the pizza. Defaults to an empty array.",
+      "description": "The list of toppings on the pizza.",
       "items": {
         "type": "string"
       },
@@ -95,7 +95,7 @@
     },
     "2": {
       "type": "array",
-      "description": "The list of toppings on the pizza. Defaults to an empty array.",
+      "description": "The list of toppings on the pizza.",
       "items": {
         "type": "string"
       },
