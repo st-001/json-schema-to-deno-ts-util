@@ -230,6 +230,16 @@ async function processSchemaFiles() {
         const schemaFilePath = `${subSchemaDirPath}/${subDirEntry.name}`;
         const schemaText = await Deno.readTextFile(schemaFilePath);
         const originalSchema = JSON.parse(schemaText);
+
+        const valid = ajv.validateSchema(originalSchema);
+        if (!valid) {
+          console.error(
+            `Invalid schema in file ${schemaFilePath}:`,
+            ajv.errors,
+          );
+          continue; // Skip processing for invalid schemas
+        }
+
         const propertyKeys = Object.keys(originalSchema.properties);
         const propertyMappingTable = generateMappingTable(propertyKeys);
         const enumMappingTables = generateMappingTables(originalSchema);
