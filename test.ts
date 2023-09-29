@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-explicit-any
 import Ajv from "https://esm.sh/ajv@8.12.0";
 import addFormats from "https://esm.sh/ajv-formats@2.1.1";
 
@@ -5,10 +6,13 @@ const ajv = new Ajv({ allErrors: true });
 addFormats(ajv);
 
 const schemaDir = "./schemas";
+
+async function loadSchemaJson(schemaPath: string) {
+  return ajv.compile(JSON.parse(await Deno.readTextFile(schemaPath)))
+    .schema as any;
+}
+
 for await (const dirEntry of Deno.readDir(schemaDir)) {
-  const subSchemaDirPath = `${schemaDir}/${dirEntry.name}`;
-  const schema = JSON.parse(
-    await Deno.readTextFile(`${subSchemaDirPath}/schema.json`),
-  );
-  console.log(schema);
+  const schemaPath = `${schemaDir}/${dirEntry.name}/schema.json`;
+  const originalSchema = await loadSchemaJson(schemaPath);
 }

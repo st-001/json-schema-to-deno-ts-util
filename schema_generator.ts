@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-explicit-any
 import Ajv from "https://esm.sh/ajv@8.12.0";
 import addFormats from "https://esm.sh/ajv-formats@2.1.1";
 
@@ -106,7 +107,7 @@ function compressSchemaKeys(
 }
 
 export function generateTSContent({
-  originalSchema,
+  schema,
   compressedSchema,
   propertyMappingTable,
   enumMappingTables,
@@ -114,7 +115,7 @@ export function generateTSContent({
   originalTSInterface,
   compressedTSInterface,
 }: {
-  originalSchema: any;
+  schema: any;
   compressedSchema: any;
   propertyMappingTable: { [key: string]: string };
   enumMappingTables: { [key: string]: { [key: string]: string } };
@@ -131,7 +132,7 @@ export function generateTSContent({
 
   ${compressedTSInterface}
 
-  export const originalSchema = ${JSON.stringify(originalSchema, null, 2)};
+  export const originalSchema = ${JSON.stringify(schema, null, 2)};
 
   export const compressedSchema = ${JSON.stringify(compressedSchema, null, 2)};
 
@@ -207,87 +208,60 @@ function generateCompressedTSInterface(
   return tsInterface;
 }
 
+async function loadSchemaJson(schemaPath: string) {
+  return ajv.compile(JSON.parse(await Deno.readTextFile(schemaPath)))
+    .schema as any;
+}
+
 async function processSchemaFiles() {
-  try {
-    const stat = await Deno.stat(schemaDir);
-    if (!stat.isDirectory) {
-      console.error(`${schemaDir} is not a directory.`);
-      return;
-    }
-  } catch (error) {
-    if (error instanceof Deno.errors.NotFound) {
-      console.error(`Directory ${schemaDir} does not exist.`);
-    } else {
-      console.error(`Failed to access ${schemaDir}: ${error.message}`);
-    }
-    return;
-  }
-
   for await (const dirEntry of Deno.readDir(schemaDir)) {
-    if (!dirEntry.isDirectory) continue;
-    const subSchemaDirPath = `${schemaDir}/${dirEntry.name}`;
-    for await (const subDirEntry of Deno.readDir(subSchemaDirPath)) {
-      if (subDirEntry.isFile && subDirEntry.name.endsWith(".json")) {
-        const schemaFilePath = `${subSchemaDirPath}/${subDirEntry.name}`;
-        const schemaText = await Deno.readTextFile(schemaFilePath);
-        const originalSchema = JSON.parse(schemaText);
+    const schemaPath = `${schemaDir}/${dirEntry.name}/schema.json`;
+    const schema = await loadSchemaJson(schemaPath);
+    const propertyMappingTable = generateMappingTable(
+      Object.keys(schema.properties),
+    );
+    const compressedSchema = compressSchemaKeys(
+      schema,
+      propertyMappingTable,
+      generateMappingTables(schema),
+    );
+    const interfaceName = schema.$id;
+    const compressedInterfaceName = `${interfaceName}Compressed`;
+    const originalTSInterface = generateTSInterface(
+      schema,
+      interfaceName,
+    );
+    const compressedTSInterface = generateCompressedTSInterface(
+      compressedSchema,
+      propertyMappingTable,
+      generateMappingTables(schema),
+      compressedInterfaceName,
+    );
 
-        const valid = ajv.validateSchema(originalSchema);
-        if (!valid) {
-          console.error(
-            `Invalid schema in file ${schemaFilePath}:`,
-            ajv.errors,
-          );
-          continue; // Skip processing for invalid schemas
-        }
+    // Call to generateTSContent function
+    const tsContent = generateTSContent({
+      schema,
+      compressedSchema,
+      propertyMappingTable,
+      enumMappingTables: generateMappingTables(schema),
+      interfaceName,
+      compressedInterfaceName,
+      originalTSInterface,
+      compressedTSInterface,
+    });
 
-        const propertyKeys = Object.keys(originalSchema.properties);
-        const propertyMappingTable = generateMappingTable(propertyKeys);
-        const enumMappingTables = generateMappingTables(originalSchema);
-        const compressedSchema = compressSchemaKeys(
-          originalSchema,
-          propertyMappingTable,
-          enumMappingTables,
-        );
-        const interfaceName = originalSchema.$id;
-        const compressedInterfaceName = `${interfaceName}Compressed`;
-        const originalTSInterface = generateTSInterface(
-          originalSchema,
-          interfaceName,
-        );
-        const compressedTSInterface = generateCompressedTSInterface(
-          compressedSchema,
-          propertyMappingTable,
-          enumMappingTables,
-          compressedInterfaceName,
-        );
+    // Construct the path to the folder based on the interface name
+    const folderPath = `./schemas/${interfaceName}`;
+    console.log(folderPath);
 
-        // Call to generateTSContent function
-        const tsContent = generateTSContent({
-          originalSchema,
-          compressedSchema,
-          propertyMappingTable,
-          enumMappingTables,
-          interfaceName,
-          compressedInterfaceName,
-          originalTSInterface,
-          compressedTSInterface,
-        });
+    // Ensure the folder exists before writing the file
+    await Deno.mkdir(folderPath, { recursive: true });
 
-        // Construct the path to the folder based on the interface name
-        const folderPath = `./schemas/${interfaceName}`;
-        console.log(folderPath);
+    // Construct the path to the generated file
+    const filePath = `${folderPath}/${interfaceName}.ts`;
 
-        // Ensure the folder exists before writing the file
-        await Deno.mkdir(folderPath, { recursive: true });
-
-        // Construct the path to the generated file
-        const filePath = `${folderPath}/${interfaceName}.ts`;
-
-        // Write the content to the file
-        await Deno.writeTextFile(filePath, tsContent);
-      }
-    }
+    // Write the content to the file
+    await Deno.writeTextFile(filePath, tsContent);
   }
 }
 
