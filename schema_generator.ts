@@ -182,7 +182,7 @@ function generateCompressedTSInterface(
   enumMappingTables: { [key: string]: { [key: string]: string } },
   name: string,
 ): string {
-  let tsInterface = `export interface ${name} {\n`;
+  let tsInterface = `export interface ${name} {`;
   for (const property in schema.properties) {
     const shortKey = propertyMappingTable[property] || property;
     let type = schema.properties[property].type;
@@ -200,7 +200,7 @@ function generateCompressedTSInterface(
     } else if (type === "number") {
       type = "number | string";
     }
-    tsInterface += `  ${shortKey}: ${type};\n`;
+    tsInterface += ` ${shortKey}: ${type};`;
   }
   tsInterface += "}\n";
   return tsInterface;
