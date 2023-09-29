@@ -4,6 +4,8 @@ import addFormats from "https://esm.sh/ajv-formats@2.1.1";
 const ajv = new Ajv({ allErrors: true });
 addFormats(ajv);
 
+const schemaDir = "./schemas";
+
 function generateEnumMappingTable(
   enumValues: string[],
 ): { [key: string]: string } {
@@ -158,7 +160,7 @@ export function generateTSContent({
 }
 
 function generateTSInterface(schema: any, name: string): string {
-  let tsInterface = `export interface ${name} {\n`;
+  let tsInterface = `export interface ${name} {`;
   for (const property in schema.properties) {
     let type = schema.properties[property].type;
     if (type === "array") {
@@ -169,7 +171,7 @@ function generateTSInterface(schema: any, name: string): string {
         `"${value}"`
       ).join(" | ");
     }
-    tsInterface += `  ${property}: ${type};\n`;
+    tsInterface += ` ${property}: ${type};`;
   }
   tsInterface += "}\n";
   return tsInterface;
@@ -206,7 +208,6 @@ function generateCompressedTSInterface(
 }
 
 async function processSchemaFiles() {
-  const schemaDir = "./schemas";
   try {
     const stat = await Deno.stat(schemaDir);
     if (!stat.isDirectory) {
@@ -223,7 +224,7 @@ async function processSchemaFiles() {
   }
 
   for await (const dirEntry of Deno.readDir(schemaDir)) {
-    if (!dirEntry.isDirectory) continue; // Skip non-directory entries
+    if (!dirEntry.isDirectory) continue;
     const subSchemaDirPath = `${schemaDir}/${dirEntry.name}`;
     for await (const subDirEntry of Deno.readDir(subSchemaDirPath)) {
       if (subDirEntry.isFile && subDirEntry.name.endsWith(".json")) {
