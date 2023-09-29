@@ -8,6 +8,7 @@ function generateEnumMappingTable(
   enumValues: string[],
 ): { [key: string]: string } {
   const mappingTable: { [key: string]: string } = {};
+
   enumValues.forEach((value, index) => {
     mappingTable[value] = index.toString();
   });
