@@ -1,5 +1,6 @@
 {
   "tasks": {
-    "order": "deno run --allow-all main.ts"
+    "order": "deno run --allow-all main.ts",
+    "update": "deno run --allow-all schema_generator.ts"
   }
 }

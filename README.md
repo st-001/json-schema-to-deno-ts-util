@@ -221,6 +221,7 @@ Oh, and for your other order of a medium tomato sauce pizza with just cheese, I 
 ```
 
 Here are a few more examples:
+
 Input
 ```plaintext
 one small with bacon and eggs, and another large with cheese, fries, pasta

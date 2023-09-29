@@ -8,7 +8,7 @@ Deno.test(function convertSauceTest() {
 });
 
 Deno.test(function convertSizeTest() {
-  assertEquals(convertSize("s"), "small");
+  assertEquals(convertSize("s"), "small");   
   assertEquals(convertSize("m"), "medium");
   assertEquals(convertSize("l"), "large");
 });
