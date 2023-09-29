@@ -5,8 +5,6 @@ import addFormats from "https://esm.sh/ajv-formats@2.1.1";
 const ajv = new Ajv({ allErrors: true });
 addFormats(ajv);
 
-const schemaDir = "./schemas";
-
 function generateEnumMappingTable(
   enumValues: string[],
 ): { [key: string]: string } {
@@ -132,9 +130,9 @@ export function generateTSContent({
 
   ${compressedTSInterface}
 
-  export const originalSchema = ${JSON.stringify(schema, null, 2)};
+  export const schema = ${JSON.stringify(schema, null, 2)};
 
-  export const compressedSchema = ${JSON.stringify(compressedSchema, null, 2)};
+  export const schemaCompressed = ${JSON.stringify(compressedSchema, null, 2)};
 
   export const propertyMappingTable = ${
     JSON.stringify(propertyMappingTable, null, 2)
@@ -147,7 +145,7 @@ export function generateTSContent({
   const ajv = new Ajv({ allErrors: true });
   addFormats(ajv);
 
-  const validate = ajv.compile(compressedSchema);
+  const validate = ajv.compile(schemaCompressed);
 
   export function validateData(data: ${compressedInterfaceName}): { valid: boolean; errors: any } {
     const valid = validate(data);
@@ -214,9 +212,10 @@ async function loadSchemaJson(schemaPath: string) {
 }
 
 async function processSchemaFiles() {
-  for await (const dirEntry of Deno.readDir(schemaDir)) {
-    const schemaPath = `${schemaDir}/${dirEntry.name}/schema.json`;
-    const schema = await loadSchemaJson(schemaPath);
+  for await (const dirEntry of Deno.readDir("./schemas")) {
+    const schema = await loadSchemaJson(
+      `./schemas/${dirEntry.name}/schema.json`,
+    );
     const propertyMappingTable = generateMappingTable(
       Object.keys(schema.properties),
     );
