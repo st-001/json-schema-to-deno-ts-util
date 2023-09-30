@@ -2,6 +2,10 @@
 import Ajv from "https://esm.sh/ajv@8.12.0";
 import addFormats from "https://esm.sh/ajv-formats@2.1.1";
 
+interface KeyValue {
+  [key: string]: string;
+}
+
 const ajv = new Ajv({ allErrors: true });
 addFormats(ajv);
 
@@ -122,40 +126,26 @@ export function generateTSContent({
   originalTSInterface: string;
   compressedTSInterface: string;
 }): string {
-  const tsContent = `
-  import Ajv from "https://esm.sh/ajv@8.12.0";
-  import addFormats from "https://esm.sh/ajv-formats@2.1.1";
-
-  ${originalTSInterface}
-
-  ${compressedTSInterface}
-
-  export const schema = ${JSON.stringify(schema, null, 2)};
-
-  export const schemaCompressed = ${JSON.stringify(compressedSchema, null, 2)};
-
-  export const propertyMappingTable = ${
-    JSON.stringify(propertyMappingTable, null, 2)
-  };
-
-  export const enumMappingTables = ${
-    JSON.stringify(enumMappingTables, null, 2)
-  };
-
-  const ajv = new Ajv({ allErrors: true });
-  addFormats(ajv);
-
-  const validate = ajv.compile(schemaCompressed);
-
-  export function validateData(data: ${compressedInterfaceName}): { valid: boolean; errors: any } {
-    const valid = validate(data);
-    return {
-      valid,
-      errors: validate.errors,
-    };
-  }
-  `;
-  return tsContent;
+  return `
+import Ajv from "https://esm.sh/ajv@8.12.0";
+import addFormats from "https://esm.sh/ajv-formats@2.1.1";
+${originalTSInterface}
+${compressedTSInterface}
+export const schema = ${JSON.stringify(schema)};
+export const schemaCompressed = ${JSON.stringify(compressedSchema)};
+export const propertyMappingTable = ${JSON.stringify(propertyMappingTable)};
+export const enumMappingTables = ${JSON.stringify(enumMappingTables)};
+const ajv = new Ajv({ allErrors: true });
+addFormats(ajv);
+const validate = ajv.compile(schemaCompressed);
+export function validateData(data: ${compressedInterfaceName}): { valid: boolean; errors: any } {
+const valid = validate(data);
+return {
+valid,
+errors: validate.errors,
+};
+}
+`;
 }
 
 function generateTSInterface(schema: any, name: string): string {
@@ -172,7 +162,7 @@ function generateTSInterface(schema: any, name: string): string {
     }
     tsInterface += ` ${property}: ${type};`;
   }
-  tsInterface += "}\n";
+  tsInterface += "}";
   return tsInterface;
 }
 
@@ -202,7 +192,7 @@ function generateCompressedTSInterface(
     }
     tsInterface += ` ${shortKey}: ${type};`;
   }
-  tsInterface += "}\n";
+  tsInterface += "}";
   return tsInterface;
 }
 
