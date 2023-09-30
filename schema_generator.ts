@@ -3,7 +3,7 @@ import Ajv from "https://esm.sh/ajv@8.12.0";
 import addFormats from "https://esm.sh/ajv-formats@2.1.1";
 
 interface KeyValue {
-  [key: string]: string;
+  [key: string | number]: string | number;
 }
 
 const ajv = new Ajv({ allErrors: true });
@@ -15,7 +15,7 @@ function generateEnumMappingTable(
   const mappingTable: KeyValue = {};
 
   enumValues.forEach((value, index) => {
-    mappingTable[value] = index.toString();
+    mappingTable[value] = index;
   });
   return mappingTable;
 }
@@ -35,16 +35,16 @@ function generateMappingTables(
 }
 
 function compressEnumValues(
-  enumValues: string[],
+  enumValues: number[],
   mappingTable: KeyValue,
-): string[] {
+): number[] {
   return enumValues.map((value) => mappingTable[value] || value);
 }
 
 function generateMappingTable(keys: string[]): KeyValue {
   const mappingTable: KeyValue = {};
   keys.forEach((key, index) => {
-    mappingTable[key] = index.toString();
+    mappingTable[key] = index;
   });
   return mappingTable;
 }
@@ -208,11 +208,15 @@ async function processSchemaFiles() {
     const propertyMappingTable = generateMappingTable(
       Object.keys(schema.properties),
     );
+
+    const enumMappingTables = generateMappingTables(schema);
+
     const compressedSchema = compressSchemaKeys(
       schema,
       propertyMappingTable,
       generateMappingTables(schema),
     );
+
     const interfaceName = schema.$id;
     const compressedInterfaceName = `${interfaceName}Compressed`;
     const originalTSInterface = generateTSInterface(
@@ -222,7 +226,7 @@ async function processSchemaFiles() {
     const compressedTSInterface = generateCompressedTSInterface(
       compressedSchema,
       propertyMappingTable,
-      generateMappingTables(schema),
+      enumMappingTables,
       compressedInterfaceName,
     );
 
@@ -240,7 +244,6 @@ async function processSchemaFiles() {
 
     // Construct the path to the folder based on the interface name
     const folderPath = `./schemas/${interfaceName}`;
-    console.log(folderPath);
 
     // Ensure the folder exists before writing the file
     await Deno.mkdir(folderPath, { recursive: true });
