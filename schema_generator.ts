@@ -11,8 +11,8 @@ addFormats(ajv);
 
 function generateEnumMappingTable(
   enumValues: string[],
-): { [key: string]: string } {
-  const mappingTable: { [key: string]: string } = {};
+): KeyValue {
+  const mappingTable: KeyValue = {};
 
   enumValues.forEach((value, index) => {
     mappingTable[value] = index.toString();
@@ -22,8 +22,8 @@ function generateEnumMappingTable(
 
 function generateMappingTables(
   schema: any,
-): { [key: string]: { [key: string]: string } } {
-  const mappingTables: { [key: string]: { [key: string]: string } } = {};
+): { [key: string]: KeyValue } {
+  const mappingTables: { [key: string]: KeyValue } = {};
   for (const property in schema.properties) {
     if (schema.properties[property].enum) {
       mappingTables[property] = generateEnumMappingTable(
@@ -36,13 +36,13 @@ function generateMappingTables(
 
 function compressEnumValues(
   enumValues: string[],
-  mappingTable: { [key: string]: string },
+  mappingTable: KeyValue,
 ): string[] {
   return enumValues.map((value) => mappingTable[value] || value);
 }
 
-function generateMappingTable(keys: string[]): { [key: string]: string } {
-  const mappingTable: { [key: string]: string } = {};
+function generateMappingTable(keys: string[]): KeyValue {
+  const mappingTable: KeyValue = {};
   keys.forEach((key, index) => {
     mappingTable[key] = index.toString();
   });
@@ -51,8 +51,8 @@ function generateMappingTable(keys: string[]): { [key: string]: string } {
 
 function compressSchemaKeys(
   schema: any,
-  propertyMappingTable: { [key: string]: string },
-  enumMappingTables: { [key: string]: { [key: string]: string } },
+  propertyMappingTable: KeyValue,
+  enumMappingTables: { [key: string]: KeyValue },
 ): any {
   if (Array.isArray(schema)) return schema;
   if (typeof schema !== "object" || schema === null) return schema;
@@ -119,15 +119,14 @@ export function generateTSContent({
 }: {
   schema: any;
   compressedSchema: any;
-  propertyMappingTable: { [key: string]: string };
-  enumMappingTables: { [key: string]: { [key: string]: string } };
+  propertyMappingTable: KeyValue;
+  enumMappingTables: { [key: string]: KeyValue };
   interfaceName: string;
   compressedInterfaceName: string;
   originalTSInterface: string;
   compressedTSInterface: string;
 }): string {
-  return `
-import Ajv from "https://esm.sh/ajv@8.12.0";
+  return `import Ajv from "https://esm.sh/ajv@8.12.0";
 import addFormats from "https://esm.sh/ajv-formats@2.1.1";
 ${originalTSInterface}
 ${compressedTSInterface}
@@ -168,8 +167,8 @@ function generateTSInterface(schema: any, name: string): string {
 
 function generateCompressedTSInterface(
   schema: any,
-  propertyMappingTable: { [key: string]: string },
-  enumMappingTables: { [key: string]: { [key: string]: string } },
+  propertyMappingTable: KeyValue,
+  enumMappingTables: { [key: string]: KeyValue },
   name: string,
 ): string {
   let tsInterface = `export interface ${name} {`;
