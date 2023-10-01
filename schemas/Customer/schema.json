@@ -5,19 +5,26 @@
   "properties": {
     "name": {
       "type": "string",
-      "description": "The name of the customer."
+      "description": "The name of the customer.",
+      "default": null
     },
     "address": {
       "type": "string",
-      "description": "The address of the customer."
+      "description": "The address of the customer.",
+      "default": null
     },
     "phone": {
       "type": "string",
-      "description": "The phone number of the customer."
+      "description": "The phone number of the customer.",
+      "default": null
     },
     "email": {
       "type": "string",
-      "description": "The email address of the customer."
+      "description": "The email address of the customer.",
+      "default": null
     }
-  }
+  },
+  "required": [
+    "name"
+  ]
 }

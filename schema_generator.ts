@@ -6,14 +6,81 @@ interface KeyValue {
   [key: string | number]: string | number;
 }
 
-const ajv = new Ajv({ allErrors: true });
+const ajv = new Ajv({ allErrors: true, allowUnionTypes: true });
 addFormats(ajv);
+// users can only provide schemas that match this Meta-Schema.
+const metaSchema = {
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "Meta-Schema for validating user-provided schemas",
+  "type": "object",
+  "properties": {
+    "$id": {
+      "type": "string",
+    },
+    "type": {
+      "type": "string",
+      "enum": ["object"],
+    },
+    "description": {
+      "type": "string",
+    },
+    "properties": {
+      "type": "object",
+      "patternProperties": {
+        ".*": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["string", "number", "array"],
+            },
+            "description": {
+              "type": "string",
+            },
+            "default": {
+              "type": ["string", "number", "array", "null"],
+            },
+            "enum": {
+              "type": "array",
+              "items": {
+                "type": ["string", "number"],
+              },
+            },
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": ["string", "number"],
+                },
+              },
+              "required": ["type"],
+            },
+            "minimum": {
+              "type": "number",
+            },
+          },
+          "required": ["type", "description", "default"],
+          "additionalProperties": false,
+        },
+      },
+    },
+    "required": {
+      "type": "array",
+      "items": {
+        "type": "string",
+      },
+    },
+  },
+  "required": ["$id", "type", "description", "properties", "required"],
+  "additionalProperties": false,
+};
+const validateMeta = ajv.compile(metaSchema); // Compile the Meta-Schema
 
 function generateEnumMappingTable(
   enumValues: string[],
 ): KeyValue {
   const mappingTable: KeyValue = {};
-
   enumValues.forEach((value, index) => {
     mappingTable[value] = index;
   });
@@ -35,16 +102,18 @@ function generateMappingTables(
 }
 
 function compressEnumValues(
-  enumValues: number[],
+  enumValues: (string | number)[],
   mappingTable: KeyValue,
-): number[] {
-  return enumValues.map((value) => mappingTable[value] || value);
+): (string | number)[] {
+  return enumValues.map((value) =>
+    mappingTable[value] !== undefined ? mappingTable[value] : value
+  );
 }
 
 function generateMappingTable(keys: string[]): KeyValue {
   const mappingTable: KeyValue = {};
   keys.forEach((key, index) => {
-    mappingTable[key] = index;
+    mappingTable[key] = index + 1;
   });
   return mappingTable;
 }
@@ -63,30 +132,36 @@ function compressSchemaKeys(
       compressed[key] = {};
       for (const propertyKey in schema[key]) {
         const shortKey = propertyMappingTable[propertyKey] || propertyKey;
-        if (schema[key][propertyKey].enum && enumMappingTables[propertyKey]) {
-          const enumMappingStr = schema[key][propertyKey].enum
+
+        // Clone the property to avoid changing the original schema.
+        const clonedProperty = { ...schema[key][propertyKey] };
+
+        if (clonedProperty.enum && enumMappingTables[propertyKey]) {
+          // If property has enum, then change its type to number in the compressed schema
+          clonedProperty.type = "number";
+
+          const enumMappingStr = clonedProperty.enum
             .map((value: string) =>
               `${enumMappingTables[propertyKey][value]} = ${value}`
             )
             .join(", ");
-          const newDescription = `${
-            schema[key][propertyKey].description
-          } Enum mapping: ${enumMappingStr}.`;
-          const compressedDefault = schema[key][propertyKey].default
-            ? enumMappingTables[propertyKey][schema[key][propertyKey].default]
+          const newDescription =
+            `${clonedProperty.description} Enum mapping: ${enumMappingStr}.`;
+          const compressedDefault = clonedProperty.default
+            ? enumMappingTables[propertyKey][clonedProperty.default]
             : undefined;
           compressed[key][shortKey] = {
-            ...schema[key][propertyKey],
+            ...clonedProperty,
             description: newDescription,
             enum: compressEnumValues(
-              schema[key][propertyKey].enum,
+              clonedProperty.enum,
               enumMappingTables[propertyKey],
             ),
             default: compressedDefault,
           };
         } else {
           compressed[key][shortKey] = compressSchemaKeys(
-            schema[key][propertyKey],
+            clonedProperty,
             propertyMappingTable,
             enumMappingTables,
           );
@@ -94,7 +169,7 @@ function compressSchemaKeys(
       }
     } else if (key === "required" && Array.isArray(schema[key])) {
       compressed[key] = schema[key].map((propertyKey: string) =>
-        propertyMappingTable[propertyKey] || propertyKey
+        String(propertyMappingTable[propertyKey] || propertyKey)
       );
     } else {
       compressed[key] = compressSchemaKeys(
@@ -126,13 +201,32 @@ export function generateTSContent({
   originalTSInterface: string;
   compressedTSInterface: string;
 }): string {
+  // Function to decompress the JSON object
+  const decompressFunction = `
+export function decompressData(compressedData: ${compressedInterfaceName}): ${schema.$id} {
+  const decompressedData: { [key: string]: any } = {};
+  for (const compressedKey in compressedData) {
+    const originalKey = Object.keys(propertyMappingTable).find(
+      key => propertyMappingTable[key] === +compressedKey
+    );
+    if (originalKey) {
+      decompressedData[originalKey] = compressedData[compressedKey];
+    }
+  }
+  return decompressedData as ${schema.$id};
+}
+  `;
+
   return `import Ajv from "https://esm.sh/ajv@8.12.0";
 import addFormats from "https://esm.sh/ajv-formats@2.1.1";
 ${originalTSInterface}
-${compressedTSInterface}
 export const schema = ${JSON.stringify(schema)};
+
+${compressedTSInterface}
 export const schemaCompressed = ${JSON.stringify(compressedSchema)};
-export const propertyMappingTable = ${JSON.stringify(propertyMappingTable)};
+export const propertyMappingTable: { [key: string]: number } = ${
+    JSON.stringify(propertyMappingTable)
+  };
 export const enumMappingTables = ${JSON.stringify(enumMappingTables)};
 const ajv = new Ajv({ allErrors: true });
 addFormats(ajv);
@@ -144,6 +238,7 @@ valid,
 errors: validate.errors,
 };
 }
+${decompressFunction}
 `;
 }
 
@@ -179,25 +274,30 @@ function generateCompressedTSInterface(
       const itemsType = schema.properties[property].items.type;
       type = `${itemsType}[]`;
     } else if (schema.properties[property].enum) {
-      type = schema.properties[property].enum.map((value: string) => {
+      type = schema.properties[property].enum.map((value: string | number) => {
         const enumMap = enumMappingTables[property];
-        if (enumMap && enumMap[value]) {
-          return `"${enumMap[value]}"`;
+        if (enumMap && enumMap[value] !== undefined) {
+          return enumMap[value]; // return as number, not string
         }
-        return `"${value}"`;
+        return `${value}`; // leave it as-is, but as string
       }).join(" | ");
     } else if (type === "number") {
-      type = "number | string";
+      type = "number";
     }
-    tsInterface += ` ${shortKey}: ${type};`;
+    tsInterface += ` "${shortKey}": ${type};`; // Corrected the line here
   }
   tsInterface += "}";
   return tsInterface;
 }
 
 async function loadSchemaJson(schemaPath: string) {
-  return ajv.compile(JSON.parse(await Deno.readTextFile(schemaPath)))
-    .schema as any;
+  const schema = JSON.parse(await Deno.readTextFile(schemaPath)) as any;
+  if (!validateMeta(schema)) { // Validate the user-provided schema against the Meta-Schema
+    throw new Error(
+      `Schema validation failed: ${JSON.stringify(validateMeta.errors)}`,
+    );
+  }
+  return ajv.compile(schema).schema as any;
 }
 
 async function processSchemaFiles() {
@@ -242,18 +342,18 @@ async function processSchemaFiles() {
       compressedTSInterface,
     });
 
-    // Construct the path to the folder based on the interface name
     const folderPath = `./schemas/${interfaceName}`;
-
-    // Ensure the folder exists before writing the file
     await Deno.mkdir(folderPath, { recursive: true });
-
-    // Construct the path to the generated file
     const filePath = `${folderPath}/${interfaceName}.ts`;
-
-    // Write the content to the file
     await Deno.writeTextFile(filePath, tsContent);
   }
+
+  // After the loop has finished processing all schema files, format them all at once
+  const command = new Deno.Command("deno", {
+    args: ["fmt", "./schemas"],
+  });
+  const child = command.spawn();
+  await child.status;
 }
 
 await processSchemaFiles();
