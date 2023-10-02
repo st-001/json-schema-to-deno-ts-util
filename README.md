@@ -5,6 +5,8 @@ tested it too much so expect alot of bugs and be careful
 
 If you run this code you may incur high token costs as its just prototyping.
 
+Here is an outrageous pizza order:
+
 superhans after one of his 3 day benders had a crazy idea to order 1000 pizzas.
 500 only with bbq sauce. 500 with x10 cheese. Jeremy wants 1 with 5 toppings of
 pepperoni, sausage, bacon, ham, and chicken. Mark wants 1 with 3 toppings of
@@ -12,7 +14,11 @@ pepperoni, sausage, and bacon. Super hans called back to trick mark and advised
 to add so many chillis to marks pizza, which they argued about, but mark
 eventually agreed.
 
-Lets see what fun we can have with this...
+Lets see what fun we can have with this by first structuring the data into a
+PizzaOrderItem[] type if validation passes.
+
+Here is an example of the validated data being passed back in to generate a
+story:
 
 After a wild night out with Mark and Jeremy from Peep Show, Superhans came up
 with a crazy idea, the sort one could only have after hours of madness and pure
