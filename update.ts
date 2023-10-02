@@ -68,7 +68,7 @@ function mapEnum(
 
 function generateTypeDefinitions(
   schema: Schema,
-  type: "original" | "compressed",
+  _type: "original" | "compressed",
 ): string {
   let interfaces = `interface ${schema.$id} {\n`;
   for (const [key, prop] of Object.entries(schema.properties)) {
