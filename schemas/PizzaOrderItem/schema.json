@@ -23,12 +23,38 @@
       },
       "default": []
     },
+    "area": {
+      "type": "number",
+      "description": "The region area number",
+      "enum": [1, 2, 3],
+      "default": 1
+    },
     "quantity": {
       "type": "number",
       "description": "The quantity of the pizza.",
       "default": 1,
       "minimum": 1
+    },
+    "instructions": {
+      "type": "string",
+      "description": "Special instructions for the pizza.",
+      "default": "null"
+    },
+    "discountCodes": {
+      "type": "array",
+      "description": "The list of discount codes to apply to the pizza.",
+      "items": {
+        "type": "number"
+      },
+      "default": []
     }
   },
-  "required": ["size", "sauce", "toppings", "quantity"]
+  "required": [
+    "size",
+    "sauce",
+    "toppings",
+    "quantity",
+    "instructions",
+    "discountCodes"
+  ]
 }

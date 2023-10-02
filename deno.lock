@@ -170,6 +170,7 @@
     }
   },
   "redirects": {
+    "https://deno.land/std/fs/mod.ts": "https://deno.land/std@0.203.0/fs/mod.ts",
     "https://deno.land/x/emit/mod.ts": "https://deno.land/x/emit@0.29.0/mod.ts"
   },
   "remote": {
