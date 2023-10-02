@@ -1,7 +1,7 @@
 # Structured output from OpenAI LLMs using JSON Schema, Deno, and TypeScript
 
 This is just for fun but I am sharing my findings here.... I haven't really
-tested it too much
+tested it too much so expect alot of bugs and be careful
 
 If you run this code you may incur high token costs as its just prototyping.
 
