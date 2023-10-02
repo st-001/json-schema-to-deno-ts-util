@@ -1,4 +1,3 @@
-// deno-lint-ignore-file no-explicit-any
 import Ajv from "https://esm.sh/ajv@8.12.0";
 import addFormats from "https://esm.sh/ajv-formats@2.1.1";
 
