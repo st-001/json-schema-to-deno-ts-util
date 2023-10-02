@@ -70,7 +70,7 @@ function generateTypeDefinitions(
   schema: Schema,
   _type: "original" | "compressed",
 ): string {
-  let interfaces = `interface ${schema.$id} {\n`;
+  let interfaces = `export interface ${schema.$id} {\n`;
   for (const [key, prop] of Object.entries(schema.properties)) {
     const type = prop.type === "array" ? `${prop.items!.type}[]` : prop.type;
     interfaces += `  ${key}: ${type};\n`;
@@ -153,7 +153,7 @@ function initializeAjv(): Ajv {
 `;
 
   code += "const ajv = initializeAjv();\n\n"; // Use the newly defined initializeAjv
-  code += `const compressedSchema = ${
+  code += `export const compressedSchema = ${
     JSON.stringify(compressedSchema, null, 2)
   };\n\n`;
   code += "const validate = ajv.compile(compressedSchema);\n\n";

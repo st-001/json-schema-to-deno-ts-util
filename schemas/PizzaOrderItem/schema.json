@@ -1,7 +1,7 @@
 {
   "$id": "PizzaOrderItem",
   "type": "object",
-  "description": "A pizza order item.",
+  "description": "You have requested data which matches this JSON schema. You will be provided with their response in the form of natural language (email, text message, chat bot, etc). You need to analyse it and then parse it into this schema. Your output needs to be a one line JSON schema array that contains objects which match this schema. Your output must be parsable and must validate against this schema. There can be multiple objects. If you are unable to parse the message, output an array containing an object with the default values.",
   "properties": {
     "size": {
       "type": "string",
@@ -23,12 +23,6 @@
       },
       "default": []
     },
-    "area": {
-      "type": "number",
-      "description": "The region area number",
-      "enum": [1, 2, 3],
-      "default": 1
-    },
     "quantity": {
       "type": "number",
       "description": "The quantity of the pizza.",
@@ -39,14 +33,6 @@
       "type": "string",
       "description": "Special instructions for the pizza.",
       "default": "null"
-    },
-    "discountCodes": {
-      "type": "array",
-      "description": "The list of discount codes to apply to the pizza.",
-      "items": {
-        "type": "number"
-      },
-      "default": []
     }
   },
   "required": [
@@ -54,7 +40,6 @@
     "sauce",
     "toppings",
     "quantity",
-    "instructions",
-    "discountCodes"
+    "instructions"
   ]
 }

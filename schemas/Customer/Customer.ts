@@ -8,7 +8,7 @@ function initializeAjv(): Ajv {
 }
 const ajv = initializeAjv();
 
-const compressedSchema = {
+export const compressedSchema = {
   "$id": "CustomerCompressed",
   "type": "object",
   "description": "A customer.",
@@ -42,14 +42,14 @@ const compressedSchema = {
 
 const validate = ajv.compile(compressedSchema);
 
-interface Customer {
+export interface Customer {
   name: string;
   address: string;
   phone: string;
   email: string;
 }
 
-interface CustomerCompressed {
+export interface CustomerCompressed {
   1: string;
   2: string;
   3: string;

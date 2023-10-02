@@ -8,10 +8,11 @@ function initializeAjv(): Ajv {
 }
 const ajv = initializeAjv();
 
-const compressedSchema = {
+export const compressedSchema = {
   "$id": "PizzaOrderItemCompressed",
   "type": "object",
-  "description": "A pizza order item.",
+  "description":
+    "You have requested data which matches this JSON schema. You will be provided with their response in the form of natural language (email, text message, chat bot, etc). You need to analyse it and then parse it into this schema. Your output needs to be a one line JSON schema array that contains objects which match this schema. Your output must be parsable and must validate against this schema. There can be multiple objects. If you are unable to parse the message, output an array containing an object with the default values.",
   "properties": {
     "1": {
       "type": "number",
@@ -45,66 +46,42 @@ const compressedSchema = {
     },
     "4": {
       "type": "number",
-      "description":
-        "The region area number Enum mapping: 0 = 1, 1 = 2, 2 = 3.",
-      "enum": [
-        0,
-        1,
-        2,
-      ],
-      "default": 1,
-    },
-    "5": {
-      "type": "number",
       "description": "The quantity of the pizza.",
       "default": 1,
       "minimum": 1,
     },
-    "6": {
+    "5": {
       "type": "string",
       "description": "Special instructions for the pizza.",
       "default": "null",
-    },
-    "7": {
-      "type": "array",
-      "description": "The list of discount codes to apply to the pizza.",
-      "items": {
-        "type": "number",
-      },
-      "default": [],
     },
   },
   "required": [
     "1",
     "2",
     "3",
+    "4",
     "5",
-    "6",
-    "7",
   ],
   "additionalProperties": false,
 };
 
 const validate = ajv.compile(compressedSchema);
 
-interface PizzaOrderItem {
+export interface PizzaOrderItem {
   size: string;
   sauce: string;
   toppings: string[];
-  area: number;
   quantity: number;
   instructions: string;
-  discountCodes: number[];
 }
 
-interface PizzaOrderItemCompressed {
+export interface PizzaOrderItemCompressed {
   1: number;
   2: number;
   3: string[];
   4: number;
-  5: number;
-  6: string;
-  7: number[];
+  5: string;
 }
 
 export function decompressData(
@@ -118,9 +95,7 @@ export function decompressData(
     size: ["small", "medium", "large"][compressedData["1"]],
     sauce: ["tomato", "white", "bbq"][compressedData["2"]],
     toppings: compressedData["3"],
-    area: [1, 2, 3][compressedData["4"]],
-    quantity: compressedData["5"],
-    instructions: compressedData["6"],
-    discountCodes: compressedData["7"],
+    quantity: compressedData["4"],
+    instructions: compressedData["5"],
   };
 }
