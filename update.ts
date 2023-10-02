@@ -162,7 +162,7 @@ function initializeAjv(): Ajv {
     generateTypeDefinitions(compressedSchema, "compressed");
 
   let functionBody =
-    `function decompressData(compressedData: ${originalSchema.$id}Compressed): ${originalSchema.$id} {\n`;
+    `export function decompressData(compressedData: ${originalSchema.$id}Compressed): ${originalSchema.$id} {\n`;
   functionBody += `  if (!validate(compressedData)) {
     throw new Error('Validation failed: ' + ajv.errorsText(validate.errors));
   }\n\n  return {\n`;
