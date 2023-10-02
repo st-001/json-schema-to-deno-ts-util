@@ -1,3 +1,5 @@
+I have a problem with this Deno code that takes a JSON schema object and generates some code based around it:
+```typescript
 import Ajv from "https://esm.sh/ajv@8.12.0";
 import addFormats from "https://esm.sh/ajv-formats@2.1.1";
 
@@ -7,7 +9,6 @@ interface Schema {
   description: string;
   properties: Record<string, SchemaProperty>;
   required: string[];
-  additionalProperties: false;
 }
 
 interface SchemaProperty {
@@ -33,7 +34,6 @@ function compressSchema(schema: Schema): [Schema, MappingTable] {
     description: schema.description,
     properties: {},
     required: [],
-    additionalProperties: false, // Added this line to disallow additional properties
   };
 
   const mappingTable: MappingTable = {};
@@ -83,35 +83,39 @@ function generateCode(
   mappingTable: MappingTable,
 ): string {
   let code = "";
+  // Task 1: Add import statements at the top of the generated output
   code += 'import Ajv from "https://esm.sh/ajv@8.12.0";\n';
   code += 'import addFormats from "https://esm.sh/ajv-formats@2.1.1";\n\n';
 
+  // Task 2: Initialize Ajv outside of the function
   code += "const ajv = new Ajv({ allErrors: true, allowUnionTypes: true });\n";
   code += "addFormats(ajv);\n\n";
 
-  code += `const compressedSchema = ${
-    JSON.stringify(compressedSchema, null, 2)
-  };\n\n`;
-  code += "const validate = ajv.compile(compressedSchema);\n\n";
+  // Task 3: Add compressed schema to the generated code
+  code += `const compressedSchema = ${JSON.stringify(compressedSchema)};\n\n`;
+  code += "const validate = ajv.compile(compressedSchema);\n\n"; // create a validator function here
 
   let interfaces = "";
-  interfaces += `interface ${originalSchema.$id} {\n`;
+  // Generate original interface
+  interfaces += `interface ${originalSchema.$id}{`;
   for (const [key, prop] of Object.entries(originalSchema.properties)) {
     const type = prop.type === "array" ? `${prop.items!.type}[]` : prop.type;
-    interfaces += `  ${key}: ${type};\n`;
+    interfaces += `${key}:${type};`;
   }
-  interfaces += "}\n\n";
+  interfaces += "}\n";
 
-  interfaces += `interface ${compressedSchema.$id} {\n`;
+  // Generate compressed interface with 'any' type for all properties
+  interfaces += `interface ${compressedSchema.$id}{`;
   for (const key of Object.keys(compressedSchema.properties)) {
-    interfaces += `  ${key}: any;\n`;
+    interfaces += `${key}:any;`;
   }
-  interfaces += "}\n\n";
+  interfaces += "}\n";
 
   const functionBody = generateDecompressionFunction(
     originalSchema,
     mappingTable,
-  );
+  ).replace(/\s+/g, " ").trim();
+
   return `${code}${interfaces}${functionBody}`;
 }
 
@@ -120,39 +124,45 @@ function generateDecompressionFunction(
   mappingTable: MappingTable,
 ): string {
   let functionBody =
-    `function decompressData(compressedData: ${originalSchema.$id}Compressed): ${originalSchema.$id} {\n`;
+    `function decompressData(compressedData:${originalSchema.$id}Compressed):${originalSchema.$id}{return{`;
+  // Task 4: Validate the input data before decompressing
   functionBody += `  if (!validate(compressedData)) {
     throw new Error('Validation failed: ' + ajv.errorsText(validate.errors));
-  }\n\n  return {\n`;
+  }\n\n  return {`;
 
   for (const [key, mapping] of Object.entries(mappingTable)) {
     const originalProp = originalSchema.properties[mapping.property];
-    functionBody += `    ${mapping.property}: `;
+
     if (
       originalProp.type === "array" && originalProp.enum &&
       originalProp.items!.type === "number"
     ) {
-      functionBody += `compressedData["${key}"],\n`;
+      // If it's an array of numbers with enum, no need to map or convert, simply return the value.
+      functionBody += `${mapping.property}:compressedData["${key}"],`;
     } else if (
       originalProp.type === "array" && originalProp.enum &&
       originalProp.items!.type === "string"
     ) {
-      const enumMappings = originalProp.enum.map((val) => `"${val}"`).join(
-        ", ",
-      );
+      // If it's an array of strings with enum, map the values
+      const enumMappings = originalProp.enum
+        .map((val) => `"${val}"`)
+        .join(",");
       functionBody +=
-        `compressedData["${key}"].map((v: number) => [${enumMappings}][v]),\n`;
+        `${mapping.property}:compressedData["${key}"].map((v: number) => [${enumMappings}][v]),`;
     } else if (mapping.enums) {
-      const enumMappings = Object.entries(mapping.enums).map((
-        [, val],
-      ) => (typeof val === "number" ? val : `"${val}"`)).join(", ");
-      functionBody += `[${enumMappings}][compressedData["${key}"]],\n`;
+      // For non-array properties with enum, convert the single value
+      const enumMappings = Object.entries(mapping.enums)
+        .map(([, val]) => (typeof val === "number" ? val : `"${val}"`))
+        .join(",");
+      functionBody +=
+        `${mapping.property}:[${enumMappings}][compressedData["${key}"]],`;
     } else {
-      functionBody += `compressedData["${key}"],\n`;
+      // For properties without enum, simply return the value
+      functionBody += `${mapping.property}:compressedData["${key}"],`;
     }
   }
 
-  functionBody += "  };\n}";
+  functionBody += "};}";
   return functionBody;
 }
 
@@ -267,3 +277,9 @@ async function processSchemaFiles() {
 
 // Execute the processSchemaFiles function
 await processSchemaFiles();
+```
+
+Its not generating the correct code formatting.
+
+Maybe the generating functions need to format their code with new lines before returning it
+Or maybe one of the functions is being generated incorrectly?

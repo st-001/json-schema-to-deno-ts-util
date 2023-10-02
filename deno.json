@@ -1,6 +1,7 @@
 {
   "tasks": {
     "main": "deno run --allow-all main.ts",
-    "update": "deno run --allow-all update.ts"
+    "update": "deno run --allow-all update.ts",
+    "test:customers": "deno run --allow-all ./schemas/Customer/Customer.ts"
   }
 }
