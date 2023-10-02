@@ -215,12 +215,14 @@ export function decompressData(
 On the initial prompt, we send a request to GPT-4 with only the compressed JSON
 schema in the system message.
 
-input superhans after one of his 5 day benders had a crazy idea to order 1000
-pizzas. 500 only with bbq sauce. 500 with x10 cheese. Jeremy wants 1 with 5
-toppings of pepperoni, sausage, bacon, ham, and chicken. Mark wants 1 with 3
-toppings of pepperoni, sausage, and bacon. Super hans called back to trick mark
-and advised to add so many chillis to marks pizza, which they argued about, but
-mark eventually agreed.
+Their wild order here again:
+
+superhans after one of his 5 day benders had a crazy idea to order 1000 pizzas.
+500 only with bbq sauce. 500 with x10 cheese. Jeremy wants 1 with 5 toppings of
+pepperoni, sausage, bacon, ham, and chicken. Mark wants 1 with 3 toppings of
+pepperoni, sausage, and bacon. Super hans called back to trick mark and advised
+to add so many chillis to marks pizza, which they argued about, but mark
+eventually agreed.
 
 ```typescript
 export async function getPizzaOrderItemsCompressed(content: string) {
