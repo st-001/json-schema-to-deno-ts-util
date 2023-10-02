@@ -5,29 +5,54 @@ tested it too much
 
 If you run this code you may incur high token costs as its just prototyping.
 
-```plaintext
-superhans after one of his 3 day benders had a crazy idea to order 1000 pizzas. 500 only with bbq sauce. 500 with x10 cheese. Jeremy wants 1 with 5 toppings of pepperoni, sausage, bacon, ham, and chicken. Mark wants 1 with 3 toppings of pepperoni, sausage, and bacon. Super hans called back to trick mark and advised to add so many chillis to marks pizza, which they argued about, but mark eventually agreed.
-```
+superhans after one of his 3 day benders had a crazy idea to order 1000 pizzas.
+500 only with bbq sauce. 500 with x10 cheese. Jeremy wants 1 with 5 toppings of
+pepperoni, sausage, bacon, ham, and chicken. Mark wants 1 with 3 toppings of
+pepperoni, sausage, and bacon. Super hans called back to trick mark and advised
+to add so many chillis to marks pizza, which they argued about, but mark
+eventually agreed.
 
 Lets see what fun we can have with this...
 
-```plaintext
-After a wild night out with Mark and Jeremy from Peep Show, Superhans came up with a crazy idea, the sort one could only have after hours of madness and pure genius. "Let's order 1000 pizzas! 🍕" he slurred with a big hilarious grin, his ideas as outrageous as his personality. 
+After a wild night out with Mark and Jeremy from Peep Show, Superhans came up
+with a crazy idea, the sort one could only have after hours of madness and pure
+genius. "Let's order 1000 pizzas! 🍕" he slurred with a big hilarious grin, his
+ideas as outrageous as his personality.
 
-Mark and Jeremy exchanged glances, shrugged, and decided to let Superhans have his moment of fun. After all, they knew this would make an unforgettable story to re-read again later. 
+Mark and Jeremy exchanged glances, shrugged, and decided to let Superhans have
+his moment of fun. After all, they knew this would make an unforgettable story
+to re-read again later.
 
-So Superhans took the lead and did the honors, dialing the pizza place with enthusiasm. "We'd like 500 pizzas only with copious amounts of BBQ sauce, so much that it would seem like a BBQ party at a pig farm! 🐖💃", he blurted. The pizza guy on the other end almost dropped his hot combo slice, but he managed a hesitant "A-are you s-sure, sir?" Superhans laughed and confirmed their ludicrous order.
+So Superhans took the lead and did the honors, dialing the pizza place with
+enthusiasm. "We'd like 500 pizzas only with copious amounts of BBQ sauce, so
+much that it would seem like a BBQ party at a pig farm! 🐖💃", he blurted. The
+pizza guy on the other end almost dropped his hot combo slice, but he managed a
+hesitant "A-are you s-sure, sir?" Superhans laughed and confirmed their
+ludicrous order.
 
-Just when you thought it couldn't get any crazier, Superhans passed the mobile to Jeremy. "I'll have one with an orchestra of meat – pepperoni, sausage, bacon, ham, and chicken, 5 toppings on an ensemble of doughy goodness! 🍖🎶" he loudly declared, adding his own pinch of insanity to the mix.
+Just when you thought it couldn't get any crazier, Superhans passed the mobile
+to Jeremy. "I'll have one with an orchestra of meat – pepperoni, sausage, bacon,
+ham, and chicken, 5 toppings on an ensemble of doughy goodness! 🍖🎶" he loudly
+declared, adding his own pinch of insanity to the mix.
 
-Mark, being the practical and mild-mannered one in the group, took the phone next. He asked for a simple pizza: "One with 3 toppings: pepperoni, sausage, and bacon," he said. However, Superhans had a devilishly spicy trick up his sleeve. As soon as Mark handed him back the phone, he sneakily added a brutal amount of chilies 🌶️ to Mark's pizza. 
+Mark, being the practical and mild-mannered one in the group, took the phone
+next. He asked for a simple pizza: "One with 3 toppings: pepperoni, sausage, and
+bacon," he said. However, Superhans had a devilishly spicy trick up his sleeve.
+As soon as Mark handed him back the phone, he sneakily added a brutal amount of
+chilies 🌶️ to Mark's pizza.
 
-"I know you said no adventures tonight, but what’s a pizza without some fire! 🌶️🔥 How about we turn your pizza into a lava field, Mark!" he cackled. Mark balked at first, trying to wrestle the phone back, but after an intense and funny argument, he reluctantly agreed. 
+"I know you said no adventures tonight, but what’s a pizza without some fire!
+🌶️🔥 How about we turn your pizza into a lava field, Mark!" he cackled. Mark
+balked at first, trying to wrestle the phone back, but after an intense and
+funny argument, he reluctantly agreed.
 
-Oh what a night it turned out to be! Pizzas raining like meteors in a sci-fi movie 🎥, cheesy hot BBQ sauce flowing like lava, and Mark's pizza turning into a spice volcano! If pizzas could tell stories, what a tale this order would unfold! 
+Oh what a night it turned out to be! Pizzas raining like meteors in a sci-fi
+movie 🎥, cheesy hot BBQ sauce flowing like lava, and Mark's pizza turning into
+a spice volcano! If pizzas could tell stories, what a tale this order would
+unfold!
 
-Is it sane? Absolutely not! But is it a hilarious pizza story for the ages? Undoubtedly yes! 😂🍕🔥
-```
+Is it sane? Absolutely not! But is it a hilarious pizza story for the ages?
+Undoubtedly yes! 😂🍕🔥
 
 Now onto how to get the PizzaOrderItem...
 
@@ -190,11 +215,12 @@ export function decompressData(
 On the initial prompt, we send a request to GPT-4 with only the compressed JSON
 schema in the system message.
 
-input
-
-```plaintext
-superhans after one of his 5 day benders had a crazy idea to order 1000 pizzas. 500 only with bbq sauce. 500 with x10 cheese. Jeremy wants 1 with 5 toppings of pepperoni, sausage, bacon, ham, and chicken. Mark wants 1 with 3 toppings of pepperoni, sausage, and bacon. Super hans called back to trick mark and advised to add so many chillis to marks pizza, which they argued about, but mark eventually agreed.
-```
+input superhans after one of his 5 day benders had a crazy idea to order 1000
+pizzas. 500 only with bbq sauce. 500 with x10 cheese. Jeremy wants 1 with 5
+toppings of pepperoni, sausage, bacon, ham, and chicken. Mark wants 1 with 3
+toppings of pepperoni, sausage, and bacon. Super hans called back to trick mark
+and advised to add so many chillis to marks pizza, which they argued about, but
+mark eventually agreed.
 
 ```typescript
 export async function getPizzaOrderItemsCompressed(content: string) {
