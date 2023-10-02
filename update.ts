@@ -26,8 +26,10 @@ interface MappingTable {
   };
 }
 
-const IMPORT_STATEMENTS = 'import Ajv from "https://esm.sh/ajv@8.12.0";\n' +
-  'import addFormats from "https://esm.sh/ajv-formats@2.1.1";\n\n';
+const IMPORTS = [
+  'import Ajv from "https://esm.sh/ajv@8.12.0"',
+  'import addFormats from "https://esm.sh/ajv-formats@2.1.1',
+];
 
 function initializeAjv(): Ajv {
   const ajv = new Ajv({ allErrors: true, allowUnionTypes: true });
@@ -139,8 +141,18 @@ function generateCode(
   compressedSchema: Schema,
   mappingTable: MappingTable,
 ): string {
-  let code = IMPORT_STATEMENTS;
-  code += "const ajv = initializeAjv();\n\n";
+  let code = IMPORTS.join(";\n") + ";\n\n";
+
+  // Include the initializeAjv function definition in the generated code
+  code += `
+function initializeAjv(): Ajv {
+  const ajv = new Ajv({ allErrors: true, allowUnionTypes: true });
+  addFormats(ajv);
+  return ajv;
+}
+`;
+
+  code += "const ajv = initializeAjv();\n\n"; // Use the newly defined initializeAjv
   code += `const compressedSchema = ${
     JSON.stringify(compressedSchema, null, 2)
   };\n\n`;
@@ -233,7 +245,7 @@ const metaSchema = {
 const validateMeta = ajv.compile(metaSchema);
 
 async function loadSchemaJson(schemaPath: string) {
-  const schema = JSON.parse(await Deno.readTextFile(schemaPath)) as any;
+  const schema = JSON.parse(await Deno.readTextFile(schemaPath)) as Schema;
   if (!validateMeta(schema)) {
     throw new Error(
       `Schema validation failed: ${JSON.stringify(validateMeta.errors)}`,
