@@ -6,25 +6,28 @@
     "name": {
       "type": "string",
       "description": "The name of the customer.",
-      "default": "null"
+      "default": null
     },
     "address": {
       "type": "string",
       "description": "The address of the customer.",
-      "default": "null"
+      "default": null
     },
     "phone": {
       "type": "string",
       "description": "The phone number of the customer.",
-      "default": "null"
+      "default": null
     },
     "email": {
       "type": "string",
       "description": "The email address of the customer.",
-      "default": "null"
+      "default": null
     }
   },
   "required": [
-    "name"
+    "name",
+    "address",
+    "phone",
+    "email"
   ]
 }

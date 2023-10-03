@@ -1,5 +1,6 @@
 import Ajv from "https://esm.sh/ajv@8.12.0";
 import addFormats from "https://esm.sh/ajv-formats@2.1.1";
+import metaSchema from "./metaSchema.json" assert { type: "json" };
 
 interface Schema {
   $id: string;
@@ -25,11 +26,6 @@ interface MappingTable {
     enums?: { [index: number]: string | number };
   };
 }
-
-const IMPORTS = [
-  'import Ajv from "https://esm.sh/ajv@8.12.0"',
-  'import addFormats from "https://esm.sh/ajv-formats@2.1.1',
-];
 
 function initializeAjv(): Ajv {
   const ajv = new Ajv({ allErrors: true, allowUnionTypes: true });
@@ -66,10 +62,7 @@ function mapEnum(
   return { enumMapping, modifiedProp: compressedProp };
 }
 
-function generateTypeDefinitions(
-  schema: Schema,
-  _type: "original" | "compressed",
-): string {
+function generateTypeDefinitions(schema: Schema): string {
   let interfaces = `export interface ${schema.$id} {\n`;
   for (const [key, prop] of Object.entries(schema.properties)) {
     const type = prop.type === "array" ? `${prop.items!.type}[]` : prop.type;
@@ -79,12 +72,27 @@ function generateTypeDefinitions(
   return interfaces;
 }
 
+function generateEnumConstants(schema: Schema): string {
+  let enums = "";
+  for (const [key, prop] of Object.entries(schema.properties)) {
+    if (prop.enum) {
+      const enumName = key.toUpperCase() + "_ENUM";
+      enums += `  static ${enumName} = [${
+        prop.enum.map((val) => (typeof val === "string" ? `"${val}"` : val))
+          .join(", ")
+      }];\n`;
+    }
+  }
+  return enums;
+}
+
 function generateDecompressionLogic(
   originalProp: SchemaProperty,
   key: string,
   mapping: { property: string; enums?: { [index: number]: string | number } },
 ): string {
   let decompressionLogic = `    ${mapping.property}: `;
+
   if (
     originalProp.type === "array" && originalProp.enum &&
     originalProp.items!.type === "number"
@@ -94,17 +102,16 @@ function generateDecompressionLogic(
     originalProp.type === "array" && originalProp.enum &&
     originalProp.items!.type === "string"
   ) {
-    const enumMappings = originalProp.enum.map((val) => `"${val}"`).join(", ");
+    const enumConstantName = `this.${mapping.property.toUpperCase()}_ENUM`;
     decompressionLogic +=
-      `compressedData["${key}"].map((v: number) => [${enumMappings}][v]),\n`;
+      `compressedData["${key}"].map((v: number) => ${enumConstantName}[v]),\n`;
   } else if (mapping.enums) {
-    const enumMappings = Object.entries(mapping.enums).map((
-      [, val],
-    ) => (typeof val === "number" ? val : `"${val}"`)).join(", ");
-    decompressionLogic += `[${enumMappings}][compressedData["${key}"]],\n`;
+    const enumConstantName = `this.${mapping.property.toUpperCase()}_ENUM`;
+    decompressionLogic += `${enumConstantName}[compressedData["${key}"]],\n`;
   } else {
     decompressionLogic += `compressedData["${key}"],\n`;
   }
+
   return decompressionLogic;
 }
 
@@ -141,107 +148,72 @@ function generateCode(
   compressedSchema: Schema,
   mappingTable: MappingTable,
 ): string {
-  let code = IMPORTS.join(";\n") + ";\n\n";
+  let code = `import Ajv from "https://esm.sh/ajv@8.12.0";\n`;
+  code += `import addFormats from "https://esm.sh/ajv-formats@2.1.1";\n\n`;
 
-  // Include the initializeAjv function definition in the generated code
-  code += `
-function initializeAjv(): Ajv {
-  const ajv = new Ajv({ allErrors: true, allowUnionTypes: true });
-  addFormats(ajv);
-  return ajv;
-}
-`;
+  const className = `${originalSchema.$id}Util`;
 
-  code += "const ajv = initializeAjv();\n\n"; // Use the newly defined initializeAjv
-  code += `export const compressedSchema = ${
+  // Start the class definition
+  code += `class ${className} {\n`;
+
+  // Add static ajv property
+  code += `  private static ajv = this.initializeAjv();\n`;
+
+  // Add enum constants
+  code += generateEnumConstants(originalSchema) + "\n";
+
+  // Add original and compressed schemas as static properties
+  code += `  public static readonly schema = ${
+    JSON.stringify(originalSchema, null, 2)
+  };\n\n`;
+  code += `  public static readonly compressedSchema = ${
     JSON.stringify(compressedSchema, null, 2)
   };\n\n`;
-  code += "const validate = ajv.compile(compressedSchema);\n\n";
 
-  const interfaces = generateTypeDefinitions(originalSchema, "original") +
-    generateTypeDefinitions(compressedSchema, "compressed");
+  // Add validateOriginal and validateCompressed as static properties
+  code +=
+    `  private static validate = ${className}.ajv.compile(${className}.schema);\n`;
+  code +=
+    `  private static validateCompressed = ${className}.ajv.compile(${className}.compressedSchema);\n\n`;
 
+  // Add the initializeAjv function as a static method
+  code += `  static initializeAjv(): Ajv {\n`;
+  code +=
+    `    const ajv = new Ajv({ allErrors: true, allowUnionTypes: true });\n`;
+  code += `    addFormats(ajv);\n`;
+  code += `    return ajv;\n`;
+  code += `  }\n\n`;
+
+  // Add the decompressData function as a static method
   let functionBody =
-    `export function decompressData(compressedData: ${originalSchema.$id}Compressed): ${originalSchema.$id} {\n`;
-  functionBody += `  if (!validate(compressedData)) {
-    throw new Error('Validation failed: ' + ajv.errorsText(validate.errors));
-  }\n\n  return {\n`;
+    `  static decompress(compressedData: ${originalSchema.$id}Compressed): ${originalSchema.$id} {\n`;
+  functionBody += `    if (!this.validateCompressed(compressedData)) {\n`;
+  functionBody +=
+    `      throw new Error("Validation failed: " + this.ajv.errorsText(this.validateCompressed.errors));\n`;
+  functionBody += `    }\n\n    return {\n`;
   for (const [key, mapping] of Object.entries(mappingTable)) {
     const originalProp = originalSchema.properties[mapping.property];
     functionBody += generateDecompressionLogic(originalProp, key, mapping);
   }
-  functionBody += "  };\n}";
-  return `${code}${interfaces}${functionBody}`;
+  functionBody += "    };\n";
+  functionBody += "  }\n";
+
+  // Close the class definition
+  code += functionBody;
+  code += "}\n\n";
+
+  const interfaces = generateTypeDefinitions(originalSchema) +
+    generateTypeDefinitions(compressedSchema);
+
+  // Export the class and interfaces
+  code += interfaces;
+  code += `export { ${className} };\n`;
+
+  return code;
 }
 
 const ajv = initializeAjv();
-const metaSchema = {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "MetaSchema",
-  "description": "Meta-Schema for validating user-provided schemas",
-  "type": "object",
-  "properties": {
-    "$id": {
-      "type": "string",
-    },
-    "type": {
-      "type": "string",
-      "enum": ["object"],
-    },
-    "description": {
-      "type": "string",
-    },
-    "properties": {
-      "type": "object",
-      "patternProperties": {
-        ".*": {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "enum": ["string", "number", "array"],
-            },
-            "description": {
-              "type": "string",
-            },
-            "default": {
-              "type": ["string", "number", "array", "null"],
-            },
-            "enum": {
-              "type": "array",
-              "items": {
-                "type": ["string", "number"],
-              },
-            },
-            "items": {
-              "type": "object",
-              "properties": {
-                "type": {
-                  "type": "string",
-                  "enum": ["string", "number"],
-                },
-              },
-              "required": ["type"],
-            },
-            "minimum": {
-              "type": "number",
-            },
-          },
-          "required": ["type", "description", "default"],
-          "additionalProperties": false,
-        },
-      },
-    },
-    "required": {
-      "type": "array",
-      "items": {
-        "type": "string",
-      },
-    },
-  },
-  "required": ["$id", "type", "description", "properties", "required"],
-  "additionalProperties": false,
-};
+
 const validateMeta = ajv.compile(metaSchema);
 
 async function loadSchemaJson(schemaPath: string) {
@@ -256,6 +228,7 @@ async function loadSchemaJson(schemaPath: string) {
 
 async function processSchemaFiles() {
   for await (const dirEntry of Deno.readDir("./schemas")) {
+    if (!dirEntry.isDirectory) continue;
     const schema: Schema = await loadSchemaJson(
       `./schemas/${dirEntry.name}/schema.json`,
     );
