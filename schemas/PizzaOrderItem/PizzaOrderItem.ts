@@ -1,3 +1,9 @@
+/**
+ * AUTO-GENERATED FILE - DO NOT EDIT
+ * This file was automatically generated.
+ * Any changes made to this file will be overwritten.
+ */
+
 import Ajv from "https://esm.sh/ajv@8.12.0";
 import addFormats from "https://esm.sh/ajv-formats@2.1.1";
 
