@@ -1,5 +1,5 @@
 /**
- * AUTO-GENERATED FILE - DO NOT EDIT
+ * AUTO-GENERATED FILE - DO NOT EDIT.
  * This file was automatically generated.
  * Any changes made to this file will be overwritten.
  */
@@ -12,116 +12,120 @@ export class PizzaOrderItemUtil {
   static readonly SIZE_ENUM = ["small", "medium", "large"] as const;
   static readonly SAUCE_ENUM = ["tomato", "white", "bbq"] as const;
 
-  public static readonly schema = {
-    "$id": "PizzaOrderItem",
-    "type": "object",
-    "description": "A pizza order item.",
-    "properties": {
-      "size": {
-        "type": "string",
-        "description": "The size of the pizza.",
-        "enum": [
-          "small",
-          "medium",
-          "large",
-        ],
-        "default": "medium",
-      },
-      "sauce": {
-        "type": "string",
-        "description": "The type of sauce on the pizza.",
-        "enum": [
-          "tomato",
-          "white",
-          "bbq",
-        ],
-        "default": "tomato",
-      },
-      "toppings": {
-        "type": "array",
-        "description": "The list of toppings on the pizza.",
-        "items": {
+  public static readonly schema = Object.freeze(
+    {
+      "$id": "PizzaOrderItem",
+      "type": "object",
+      "description": "A pizza order item.",
+      "properties": {
+        "size": {
           "type": "string",
+          "description": "The size of the pizza.",
+          "enum": [
+            "small",
+            "medium",
+            "large",
+          ],
+          "default": "medium",
         },
-        "default": [],
+        "sauce": {
+          "type": "string",
+          "description": "The type of sauce on the pizza.",
+          "enum": [
+            "tomato",
+            "white",
+            "bbq",
+          ],
+          "default": "tomato",
+        },
+        "toppings": {
+          "type": "array",
+          "description": "The list of toppings on the pizza.",
+          "items": {
+            "type": "string",
+          },
+          "default": [],
+        },
+        "quantity": {
+          "type": "number",
+          "description": "The quantity of the pizza.",
+          "default": 1,
+          "minimum": 1,
+        },
+        "instructions": {
+          "type": "string",
+          "description": "Special instructions for the pizza.",
+          "default": null,
+        },
       },
-      "quantity": {
-        "type": "number",
-        "description": "The quantity of the pizza.",
-        "default": 1,
-        "minimum": 1,
-      },
-      "instructions": {
-        "type": "string",
-        "description": "Special instructions for the pizza.",
-        "default": null,
-      },
-    },
-    "required": [
-      "size",
-      "sauce",
-      "toppings",
-      "quantity",
-      "instructions",
-    ],
-  };
+      "required": [
+        "size",
+        "sauce",
+        "toppings",
+        "quantity",
+        "instructions",
+      ],
+    } as const,
+  );
 
-  public static readonly compressedSchema = {
-    "$id": "PizzaOrderItemCompressed",
-    "type": "object",
-    "description": "A pizza order item.",
-    "properties": {
-      "1": {
-        "type": "number",
-        "description":
-          "The size of the pizza. Enum mapping: 0 = small, 1 = medium, 2 = large.",
-        "enum": [
-          0,
-          1,
-          2,
-        ],
-        "default": 1,
-      },
-      "2": {
-        "type": "number",
-        "description":
-          "The type of sauce on the pizza. Enum mapping: 0 = tomato, 1 = white, 2 = bbq.",
-        "enum": [
-          0,
-          1,
-          2,
-        ],
-        "default": 0,
-      },
-      "3": {
-        "type": "array",
-        "description": "The list of toppings on the pizza.",
-        "items": {
-          "type": "string",
+  public static readonly compressedSchema = Object.freeze(
+    {
+      "$id": "PizzaOrderItemCompressed",
+      "type": "object",
+      "description": "A pizza order item.",
+      "properties": {
+        "1": {
+          "type": "number",
+          "description":
+            "The size of the pizza. Enum mapping: 0 = small, 1 = medium, 2 = large.",
+          "enum": [
+            0,
+            1,
+            2,
+          ],
+          "default": 1,
         },
-        "default": [],
+        "2": {
+          "type": "number",
+          "description":
+            "The type of sauce on the pizza. Enum mapping: 0 = tomato, 1 = white, 2 = bbq.",
+          "enum": [
+            0,
+            1,
+            2,
+          ],
+          "default": 0,
+        },
+        "3": {
+          "type": "array",
+          "description": "The list of toppings on the pizza.",
+          "items": {
+            "type": "string",
+          },
+          "default": [],
+        },
+        "4": {
+          "type": "number",
+          "description": "The quantity of the pizza.",
+          "default": 1,
+          "minimum": 1,
+        },
+        "5": {
+          "type": "string",
+          "description": "Special instructions for the pizza.",
+          "default": null,
+        },
       },
-      "4": {
-        "type": "number",
-        "description": "The quantity of the pizza.",
-        "default": 1,
-        "minimum": 1,
-      },
-      "5": {
-        "type": "string",
-        "description": "Special instructions for the pizza.",
-        "default": null,
-      },
-    },
-    "required": [
-      "1",
-      "2",
-      "3",
-      "4",
-      "5",
-    ],
-    "additionalProperties": false,
-  };
+      "required": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+      ],
+      "additionalProperties": false,
+    } as const,
+  );
 
   private static validate = PizzaOrderItemUtil.ajv.compile(
     PizzaOrderItemUtil.schema,

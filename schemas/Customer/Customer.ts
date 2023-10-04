@@ -1,5 +1,5 @@
 /**
- * AUTO-GENERATED FILE - DO NOT EDIT
+ * AUTO-GENERATED FILE - DO NOT EDIT.
  * This file was automatically generated.
  * Any changes made to this file will be overwritten.
  */
@@ -10,74 +10,78 @@ import addFormats from "https://esm.sh/ajv-formats@2.1.1";
 export class CustomerUtil {
   private static ajv = this.initializeAjv();
 
-  public static readonly schema = {
-    "$id": "Customer",
-    "type": "object",
-    "description": "A customer.",
-    "properties": {
-      "name": {
-        "type": "string",
-        "description": "The name of the customer.",
-        "default": null,
+  public static readonly schema = Object.freeze(
+    {
+      "$id": "Customer",
+      "type": "object",
+      "description": "A customer.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the customer.",
+          "default": null,
+        },
+        "address": {
+          "type": "string",
+          "description": "The address of the customer.",
+          "default": null,
+        },
+        "phone": {
+          "type": "string",
+          "description": "The phone number of the customer.",
+          "default": null,
+        },
+        "email": {
+          "type": "string",
+          "description": "The email address of the customer.",
+          "default": null,
+        },
       },
-      "address": {
-        "type": "string",
-        "description": "The address of the customer.",
-        "default": null,
-      },
-      "phone": {
-        "type": "string",
-        "description": "The phone number of the customer.",
-        "default": null,
-      },
-      "email": {
-        "type": "string",
-        "description": "The email address of the customer.",
-        "default": null,
-      },
-    },
-    "required": [
-      "name",
-      "address",
-      "phone",
-      "email",
-    ],
-  };
+      "required": [
+        "name",
+        "address",
+        "phone",
+        "email",
+      ],
+    } as const,
+  );
 
-  public static readonly compressedSchema = {
-    "$id": "CustomerCompressed",
-    "type": "object",
-    "description": "A customer.",
-    "properties": {
-      "1": {
-        "type": "string",
-        "description": "The name of the customer.",
-        "default": null,
+  public static readonly compressedSchema = Object.freeze(
+    {
+      "$id": "CustomerCompressed",
+      "type": "object",
+      "description": "A customer.",
+      "properties": {
+        "1": {
+          "type": "string",
+          "description": "The name of the customer.",
+          "default": null,
+        },
+        "2": {
+          "type": "string",
+          "description": "The address of the customer.",
+          "default": null,
+        },
+        "3": {
+          "type": "string",
+          "description": "The phone number of the customer.",
+          "default": null,
+        },
+        "4": {
+          "type": "string",
+          "description": "The email address of the customer.",
+          "default": null,
+        },
       },
-      "2": {
-        "type": "string",
-        "description": "The address of the customer.",
-        "default": null,
-      },
-      "3": {
-        "type": "string",
-        "description": "The phone number of the customer.",
-        "default": null,
-      },
-      "4": {
-        "type": "string",
-        "description": "The email address of the customer.",
-        "default": null,
-      },
-    },
-    "required": [
-      "1",
-      "2",
-      "3",
-      "4",
-    ],
-    "additionalProperties": false,
-  };
+      "required": [
+        "1",
+        "2",
+        "3",
+        "4",
+      ],
+      "additionalProperties": false,
+    } as const,
+  );
 
   private static validate = CustomerUtil.ajv.compile(CustomerUtil.schema);
   private static validateCompressed = CustomerUtil.ajv.compile(

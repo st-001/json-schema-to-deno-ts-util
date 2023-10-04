@@ -174,12 +174,12 @@ function generateCode(
   code += generateEnumConstants(originalSchema) + "\n";
 
   // Add original and compressed schemas as static properties
-  code += `  public static readonly schema = ${
+  code += `  public static readonly schema = Object.freeze(${
     JSON.stringify(originalSchema, null, 2)
-  };\n\n`;
-  code += `  public static readonly compressedSchema = ${
+  } as const);\n\n`;
+  code += `  public static readonly compressedSchema = Object.freeze(${
     JSON.stringify(compressedSchema, null, 2)
-  };\n\n`;
+  } as const);\n\n`;
 
   // Add validateOriginal and validateCompressed as static properties
   code +=
