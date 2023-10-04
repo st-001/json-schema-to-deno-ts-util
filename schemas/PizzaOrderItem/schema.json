@@ -32,7 +32,7 @@
     "instructions": {
       "type": "string",
       "description": "Special instructions for the pizza.",
-      "default": null
+      "default": ""
     }
   },
   "required": [
