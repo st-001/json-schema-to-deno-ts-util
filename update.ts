@@ -63,13 +63,22 @@ function mapEnum(
 }
 
 function generateTypeDefinitionInterface(schema: Schema): string {
-  let interfaces = `export interface ${schema.$id} {\n`;
+  let interface_ = `export interface ${schema.$id} {\n`;
+
   for (const [key, prop] of Object.entries(schema.properties)) {
-    const type = prop.type === "array" ? `${prop.items!.type}[]` : prop.type;
-    interfaces += `  ${key}: ${type};\n`;
+    let type;
+
+    if (prop.type === "array") {
+      type = `${prop.items!.type}[]`;
+    } else {
+      type = prop.type;
+    }
+
+    interface_ += `  ${key}: ${type};\n`;
   }
-  interfaces += "}";
-  return interfaces;
+
+  interface_ += "}";
+  return interface_;
 }
 
 function generateEnumConstants(schema: Schema): string {
