@@ -70,6 +70,10 @@ function generateTypeDefinitionInterface(schema: Schema): string {
 
     if (prop.type === "array") {
       type = `${prop.items!.type}[]`;
+    } else if (prop.enum) {
+      type = prop.enum.map((value) =>
+        typeof value === "string" ? `"${value}"` : value
+      ).join(" | ");
     } else {
       type = prop.type;
     }
