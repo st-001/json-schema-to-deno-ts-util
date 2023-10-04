@@ -99,6 +99,27 @@ function generateEnumConstants(schema: Schema): string {
   return enums;
 }
 
+function decompressionForArrayType(
+  originalProp: SchemaProperty,
+  key: string,
+  mapping: { property: string; enums?: { [index: number]: string | number } },
+): string {
+  const enumConstantName = `this.${mapping.property.toUpperCase()}_ENUM`;
+  if (originalProp.items!.type === "number") {
+    return `    ${mapping.property}: compressedData["${key}"],\n`;
+  } else {
+    return `compressedData["${key}"].map((v: number) => ${enumConstantName}[v]),\n`;
+  }
+}
+
+function decompressionForEnumType(
+  key: string,
+  mapping: { property: string; enums?: { [index: number]: string | number } },
+): string {
+  const enumConstantName = `this.${mapping.property.toUpperCase()}_ENUM`;
+  return `${enumConstantName}[compressedData["${key}"]],\n`;
+}
+
 function generateDecompressionLogic(
   originalProp: SchemaProperty,
   key: string,
@@ -106,21 +127,10 @@ function generateDecompressionLogic(
 ): string {
   let decompressionLogic = `    ${mapping.property}: `;
 
-  if (
-    originalProp.type === "array" && originalProp.enum &&
-    originalProp.items!.type === "number"
-  ) {
-    decompressionLogic += `compressedData["${key}"],\n`;
-  } else if (
-    originalProp.type === "array" && originalProp.enum &&
-    originalProp.items!.type === "string"
-  ) {
-    const enumConstantName = `this.${mapping.property.toUpperCase()}_ENUM`;
-    decompressionLogic +=
-      `compressedData["${key}"].map((v: number) => ${enumConstantName}[v]),\n`;
+  if (originalProp.type === "array" && originalProp.enum) {
+    decompressionLogic += decompressionForArrayType(originalProp, key, mapping);
   } else if (mapping.enums) {
-    const enumConstantName = `this.${mapping.property.toUpperCase()}_ENUM`;
-    decompressionLogic += `${enumConstantName}[compressedData["${key}"]],\n`;
+    decompressionLogic += decompressionForEnumType(key, mapping);
   } else {
     decompressionLogic += `compressedData["${key}"],\n`;
   }
