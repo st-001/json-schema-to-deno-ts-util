@@ -168,32 +168,36 @@ function generateCode(
   code += `export class ${className} {\n`;
 
   // Add static ajv property
-  code += `  private static ajv = this.initializeAjv();\n`;
+  code += `  private static ajv = (() => {
+    const ajv = new Ajv({ allErrors: true, allowUnionTypes: true });
+    addFormats(ajv);
+    return ajv;
+  })();\n`;
 
   // Add enum constants
   code += generateEnumConstants(originalSchema) + "\n";
 
   // Add original and compressed schemas as static properties
-  code += `  public static readonly schema = Object.freeze(${
+  code += `public static readonly schema = Object.freeze(${
     JSON.stringify(originalSchema, null, 2)
   } as const);\n\n`;
-  code += `  public static readonly compressedSchema = Object.freeze(${
+  code += `public static readonly compressedSchema = Object.freeze(${
     JSON.stringify(compressedSchema, null, 2)
   } as const);\n\n`;
 
+  // Add original and compressed schemas as unformatted strings
+  code += `public static readonly schemaString = '${
+    JSON.stringify(originalSchema)
+  }' as const;\n\n`;
+  code += `public static readonly compressedSchemaString = '${
+    JSON.stringify(compressedSchema)
+  }' as const;\n\n`;
+
   // Add validateOriginal and validateCompressed as static properties
   code +=
-    `  private static validate = ${className}.ajv.compile(${className}.schema);\n`;
+    `private static validate = ${className}.ajv.compile(${className}.schema);\n`;
   code +=
-    `  private static validateCompressed = ${className}.ajv.compile(${className}.compressedSchema);\n\n`;
-
-  // Add the initializeAjv function as a static method
-  code += `  static initializeAjv(): Ajv {\n`;
-  code +=
-    `    const ajv = new Ajv({ allErrors: true, allowUnionTypes: true });\n`;
-  code += `    addFormats(ajv);\n`;
-  code += `    return ajv;\n`;
-  code += `  }\n\n`;
+    `private static validateCompressed = ${className}.ajv.compile(${className}.compressedSchema);\n\n`;
 
   // Add the decompressData function as a static method
   let functionBody =
@@ -213,11 +217,9 @@ function generateCode(
   code += functionBody;
   code += "}\n\n";
 
-  const interfaces = generateTypeDefinitions(originalSchema) +
-    generateTypeDefinitions(compressedSchema);
-
-  // Export the interfaces
-  code += interfaces;
+  // generate type definitions for the original and compressed schemas
+  code += generateTypeDefinitions(originalSchema);
+  code += generateTypeDefinitions(compressedSchema);
 
   return code;
 }
