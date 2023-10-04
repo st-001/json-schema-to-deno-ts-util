@@ -80,7 +80,7 @@ function generateEnumConstants(schema: Schema): string {
       enums += `  static ${enumName} = [${
         prop.enum.map((val) => (typeof val === "string" ? `"${val}"` : val))
           .join(", ")
-      }];\n`;
+      }] as const;\n`;
     }
   }
   return enums;
@@ -154,7 +154,7 @@ function generateCode(
   const className = `${originalSchema.$id}Util`;
 
   // Start the class definition
-  code += `class ${className} {\n`;
+  code += `export class ${className} {\n`;
 
   // Add static ajv property
   code += `  private static ajv = this.initializeAjv();\n`;
@@ -205,9 +205,8 @@ function generateCode(
   const interfaces = generateTypeDefinitions(originalSchema) +
     generateTypeDefinitions(compressedSchema);
 
-  // Export the class and interfaces
+  // Export the interfaces
   code += interfaces;
-  code += `export { ${className} };\n`;
 
   return code;
 }
