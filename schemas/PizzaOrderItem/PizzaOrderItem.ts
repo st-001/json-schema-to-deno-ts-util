@@ -3,8 +3,8 @@ import addFormats from "https://esm.sh/ajv-formats@2.1.1";
 
 export class PizzaOrderItemUtil {
   private static ajv = this.initializeAjv();
-  static SIZE_ENUM = ["small", "medium", "large"] as const;
-  static SAUCE_ENUM = ["tomato", "white", "bbq"] as const;
+  static readonly SIZE_ENUM = ["small", "medium", "large"] as const;
+  static readonly SAUCE_ENUM = ["tomato", "white", "bbq"] as const;
 
   public static readonly schema = {
     "$id": "PizzaOrderItem",

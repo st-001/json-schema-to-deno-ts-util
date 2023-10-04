@@ -77,7 +77,7 @@ function generateEnumConstants(schema: Schema): string {
   for (const [key, prop] of Object.entries(schema.properties)) {
     if (prop.enum) {
       const enumName = key.toUpperCase() + "_ENUM";
-      enums += `  static ${enumName} = [${
+      enums += `  static readonly ${enumName} = [${
         prop.enum.map((val) => (typeof val === "string" ? `"${val}"` : val))
           .join(", ")
       }] as const;\n`;
