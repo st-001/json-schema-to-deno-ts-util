@@ -1,6 +1,7 @@
 import Ajv from "https://esm.sh/ajv@8.12.0";
 import addFormats from "https://esm.sh/ajv-formats@2.1.1";
 import metaSchema from "./metaSchema.json" assert { type: "json" };
+import { formatDirectory } from "./utils.ts";
 
 interface Schema {
   $id: string;
@@ -268,11 +269,7 @@ async function processSchemaFiles() {
       generatedCode,
     );
   }
-  const command = new Deno.Command("deno", {
-    args: ["fmt", "./schemas"],
-  });
-  const child = command.spawn();
-  await child.status;
 }
 
 await processSchemaFiles();
+await formatDirectory("./schemas");

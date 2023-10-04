@@ -1,0 +1,40 @@
+{
+  "$id": "Example",
+  "type": "object",
+  "description": "A example schema with all allowed scenarios.",
+  "properties": {
+    "randomNumber": {
+      "type": "number",
+      "description": "A random number",
+      "enum": [
+        1,
+        2,
+        3
+      ],
+      "default": 0
+    },
+    "randomWord": {
+      "type": "string",
+      "description": "A random word",
+      "enum": [
+        "foo",
+        "bar",
+        "baz"
+      ],
+      "default": "foo"
+    },
+    "word": {
+      "type": "string",
+      "description": "A word",
+      "default": "foo"
+    },
+    "number": {
+      "type": "number",
+      "description": "A number",
+      "default": 0
+    }
+  },
+  "required": [
+    "randomNumber"
+  ]
+}
