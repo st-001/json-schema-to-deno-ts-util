@@ -1,74 +1,37 @@
-# Structured output from OpenAI LLMs using JSON Schema, Deno, and TypeScript
+# Convert JSON Schemas to TypeScript utility classes for Deno 🦕
 
-This is just for fun but I am sharing my findings here.... I haven't really
-tested it too much so expect alot of bugs and be careful
+This is a tool that converts JSON schemas into TypeScript utility classes for
+use in Deno.
 
-If you run this code you may incur high token costs as its just prototyping.
+It currently only supports a subset of JSON schema features. I'll eventually
+expand it to support more features.
 
-Here is an outrageous pizza order:
+> 📝 **This is an experimental project that I made for my own use to compress
+> JSON schemas and data for processing through large language models and to
+> validate the output received and save on token cost. There are most likely
+> bugs. Any feedback is much appreciated!**
 
-superhans after one of his 3 day benders had a crazy idea to order 1000 pizzas.
-500 only with bbq sauce. 500 with x10 cheese. Jeremy wants 1 with 5 toppings of
-pepperoni, sausage, bacon, ham, and chicken. Mark wants 1 with 3 toppings of
-pepperoni, sausage, and bacon. Super hans called back to trick mark and advised
-to add so many chillis to marks pizza, which they argued about, but mark
-eventually agreed.
+## Features ✨
 
-Lets see what fun we can have with this by first structuring the data into a
-PizzaOrderItem[] type if validation passes.
+- **Automatic Type Generation**: From basic types to enums, get precisely
+  defined Typescript interfaces for the compressed and uncompressed versions of
+  your data.
+- **Compression & Decompression**: Efficiently store and retrieve data with
+  compressed schema support.
+- **Validation**: Built-in data validation using Ajv ensures your data adheres
+  to the schema.
+- **Reuseability**: Once generated, the utility classes can be used in other
+  Deno projects.
 
-Here is an example of the validated data being passed back in to generate a
-story:
+## Example 🚀
 
-After a wild night out with Mark and Jeremy from Peep Show, Superhans came up
-with a crazy idea, the sort one could only have after hours of madness and pure
-genius. "Let's order 1000 pizzas! 🍕" he slurred with a big hilarious grin, his
-ideas as outrageous as his personality.
-
-Mark and Jeremy exchanged glances, shrugged, and decided to let Superhans have
-his moment of fun. After all, they knew this would make an unforgettable story
-to re-read again later.
-
-So Superhans took the lead and did the honors, dialing the pizza place with
-enthusiasm. "We'd like 500 pizzas only with copious amounts of BBQ sauce, so
-much that it would seem like a BBQ party at a pig farm! 🐖💃", he blurted. The
-pizza guy on the other end almost dropped his hot combo slice, but he managed a
-hesitant "A-are you s-sure, sir?" Superhans laughed and confirmed their
-ludicrous order.
-
-Just when you thought it couldn't get any crazier, Superhans passed the mobile
-to Jeremy. "I'll have one with an orchestra of meat – pepperoni, sausage, bacon,
-ham, and chicken, 5 toppings on an ensemble of doughy goodness! 🍖🎶" he loudly
-declared, adding his own pinch of insanity to the mix.
-
-Mark, being the practical and mild-mannered one in the group, took the phone
-next. He asked for a simple pizza: "One with 3 toppings: pepperoni, sausage, and
-bacon," he said. However, Superhans had a devilishly spicy trick up his sleeve.
-As soon as Mark handed him back the phone, he sneakily added a brutal amount of
-chilies 🌶️ to Mark's pizza.
-
-"I know you said no adventures tonight, but what’s a pizza without some fire!
-🌶️🔥 How about we turn your pizza into a lava field, Mark!" he cackled. Mark
-balked at first, trying to wrestle the phone back, but after an intense and
-funny argument, he reluctantly agreed.
-
-Oh what a night it turned out to be! Pizzas raining like meteors in a sci-fi
-movie 🎥, cheesy hot BBQ sauce flowing like lava, and Mark's pizza turning into
-a spice volcano! If pizzas could tell stories, what a tale this order would
-unfold!
-
-Is it sane? Absolutely not! But is it a hilarious pizza story for the ages?
-Undoubtedly yes! 😂🍕🔥
-
-Now onto how to get the PizzaOrderItem...
-
-We start with a JSON schema that supports a limited specification
+### Input JSON schema
 
 ```json
 {
   "$id": "PizzaOrderItem",
   "type": "object",
-  "description": "You have requested data which matches this JSON schema. You will be provided with their response in the form of natural language (email, text message, chat bot, etc). You need to analyse it and then parse it into this schema. Your output needs to be a one line JSON schema array that contains objects which match this schema. Your output must be parsable and must validate against this schema. There can be multiple objects. If you are unable to parse the message, output an array containing an object with the default values.",
+  "description": "A pizza order item.",
   "properties": {
     "size": {
       "type": "string",
@@ -99,7 +62,7 @@ We start with a JSON schema that supports a limited specification
     "instructions": {
       "type": "string",
       "description": "Special instructions for the pizza.",
-      "default": "null"
+      "default": ""
     }
   },
   "required": [
@@ -112,255 +75,408 @@ We start with a JSON schema that supports a limited specification
 }
 ```
 
-TypeScript code for JSON schemas provided get automatically generated
+### Output TypeScrpt class
 
 ```typescript
+/**
+ * AUTO-GENERATED FILE - DO NOT EDIT.
+ * This file was automatically generated.
+ * Any changes made to this file will be overwritten.
+ */
+
 import Ajv from "https://esm.sh/ajv@8.12.0";
 import addFormats from "https://esm.sh/ajv-formats@2.1.1";
 
-function initializeAjv(): Ajv {
-  const ajv = new Ajv({ allErrors: true, allowUnionTypes: true });
-  addFormats(ajv);
-  return ajv;
-}
-const ajv = initializeAjv();
-
-export const compressedSchema = {
-  "$id": "PizzaOrderItemCompressed",
-  "type": "object",
-  "description":
-    "You have requested data which matches this JSON schema. You will be provided with their response in the form of natural language (email, text message, chat bot, etc). You need to analyse it and then parse it into this schema. Your output needs to be a one line JSON schema array that contains objects which match this schema. Your output must be parsable and must validate against this schema. There can be multiple objects. If you are unable to parse the message, output an array containing an object with the default values.",
-  "properties": {
-    "1": {
-      "type": "number",
-      "description":
-        "The size of the pizza. Enum mapping: 0 = small, 1 = medium, 2 = large.",
-      "enum": [
-        0,
-        1,
-        2,
-      ],
-      "default": 1,
-    },
-    "2": {
-      "type": "number",
-      "description":
-        "The type of sauce on the pizza. Enum mapping: 0 = tomato, 1 = white, 2 = bbq.",
-      "enum": [
-        0,
-        1,
-        2,
-      ],
-      "default": 0,
-    },
-    "3": {
-      "type": "array",
-      "description": "The list of toppings on the pizza.",
-      "items": {
-        "type": "string",
-      },
-      "default": [],
-    },
-    "4": {
-      "type": "number",
-      "description": "The quantity of the pizza.",
-      "default": 1,
-      "minimum": 1,
-    },
-    "5": {
-      "type": "string",
-      "description": "Special instructions for the pizza.",
-      "default": "null",
-    },
-  },
-  "required": [
-    "1",
-    "2",
-    "3",
-    "4",
-    "5",
-  ],
-  "additionalProperties": false,
-};
-
-const validate = ajv.compile(compressedSchema);
-
 export interface PizzaOrderItem {
-  size: string;
-  sauce: string;
+  size: "small" | "medium" | "large";
+  sauce: "tomato" | "white" | "bbq";
   toppings: string[];
   quantity: number;
   instructions: string;
 }
-
 export interface PizzaOrderItemCompressed {
-  1: number;
-  2: number;
+  1: 0 | 1 | 2;
+  2: 0 | 1 | 2;
   3: string[];
   4: number;
   5: string;
 }
 
-export function decompressData(
-  compressedData: PizzaOrderItemCompressed,
-): PizzaOrderItem {
-  if (!validate(compressedData)) {
-    throw new Error("Validation failed: " + ajv.errorsText(validate.errors));
+export class PizzaOrderItemUtil {
+  private static ajv = (() => {
+    const ajv = new Ajv({ allErrors: true, allowUnionTypes: true });
+    addFormats(ajv);
+    return ajv;
+  })();
+
+  static readonly SIZE_ENUM = ["small", "medium", "large"] as const;
+  static readonly SAUCE_ENUM = ["tomato", "white", "bbq"] as const;
+
+  static readonly schema = Object.freeze(
+    {
+      "$id": "PizzaOrderItem",
+      "type": "object",
+      "description": "A pizza order item.",
+      "properties": {
+        "size": {
+          "type": "string",
+          "description": "The size of the pizza.",
+          "enum": [
+            "small",
+            "medium",
+            "large",
+          ],
+          "default": "medium",
+        },
+        "sauce": {
+          "type": "string",
+          "description": "The type of sauce on the pizza.",
+          "enum": [
+            "tomato",
+            "white",
+            "bbq",
+          ],
+          "default": "tomato",
+        },
+        "toppings": {
+          "type": "array",
+          "description": "The list of toppings on the pizza.",
+          "items": {
+            "type": "string",
+          },
+          "default": [],
+        },
+        "quantity": {
+          "type": "number",
+          "description": "The quantity of the pizza.",
+          "default": 1,
+          "minimum": 1,
+        },
+        "instructions": {
+          "type": "string",
+          "description": "Special instructions for the pizza.",
+          "default": "",
+        },
+      },
+      "required": [
+        "size",
+        "sauce",
+        "toppings",
+        "quantity",
+        "instructions",
+      ],
+    } as const,
+  );
+  static readonly compressedSchema = Object.freeze(
+    {
+      "$id": "PizzaOrderItemCompressed",
+      "type": "object",
+      "description": "A pizza order item.",
+      "properties": {
+        "1": {
+          "type": "number",
+          "description":
+            "The size of the pizza. Enum mapping: 0 = small, 1 = medium, 2 = large.",
+          "enum": [
+            0,
+            1,
+            2,
+          ],
+          "default": 1,
+        },
+        "2": {
+          "type": "number",
+          "description":
+            "The type of sauce on the pizza. Enum mapping: 0 = tomato, 1 = white, 2 = bbq.",
+          "enum": [
+            0,
+            1,
+            2,
+          ],
+          "default": 0,
+        },
+        "3": {
+          "type": "array",
+          "description": "The list of toppings on the pizza.",
+          "items": {
+            "type": "string",
+          },
+          "default": [],
+        },
+        "4": {
+          "type": "number",
+          "description": "The quantity of the pizza.",
+          "default": 1,
+          "minimum": 1,
+        },
+        "5": {
+          "type": "string",
+          "description": "Special instructions for the pizza.",
+          "default": "",
+        },
+      },
+      "required": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+      ],
+      "additionalProperties": false,
+    } as const,
+  );
+  static readonly schemaString =
+    '{"$id":"PizzaOrderItem","type":"object","description":"A pizza order item.","properties":{"size":{"type":"string","description":"The size of the pizza.","enum":["small","medium","large"],"default":"medium"},"sauce":{"type":"string","description":"The type of sauce on the pizza.","enum":["tomato","white","bbq"],"default":"tomato"},"toppings":{"type":"array","description":"The list of toppings on the pizza.","items":{"type":"string"},"default":[]},"quantity":{"type":"number","description":"The quantity of the pizza.","default":1,"minimum":1},"instructions":{"type":"string","description":"Special instructions for the pizza.","default":""}},"required":["size","sauce","toppings","quantity","instructions"]}' as const;
+  static readonly compressedSchemaString =
+    '{"$id":"PizzaOrderItemCompressed","type":"object","description":"A pizza order item.","properties":{"1":{"type":"number","description":"The size of the pizza. Enum mapping: 0 = small, 1 = medium, 2 = large.","enum":[0,1,2],"default":1},"2":{"type":"number","description":"The type of sauce on the pizza. Enum mapping: 0 = tomato, 1 = white, 2 = bbq.","enum":[0,1,2],"default":0},"3":{"type":"array","description":"The list of toppings on the pizza.","items":{"type":"string"},"default":[]},"4":{"type":"number","description":"The quantity of the pizza.","default":1,"minimum":1},"5":{"type":"string","description":"Special instructions for the pizza.","default":""}},"required":["1","2","3","4","5"],"additionalProperties":false}' as const;
+  static validate = this.ajv.compile(this.schema);
+  static validateCompressed = this.ajv.compile(this.compressedSchema);
+
+  static decompress(compressedData: PizzaOrderItemCompressed): PizzaOrderItem {
+    if (!this.validateCompressed(compressedData)) {
+      throw new Error(
+        "Validation failed: " +
+          this.ajv.errorsText(this.validateCompressed.errors),
+      );
+    }
+
+    return {
+      size: this.SIZE_ENUM[compressedData["1"]],
+      sauce: this.SAUCE_ENUM[compressedData["2"]],
+      toppings: compressedData["3"],
+      quantity: compressedData["4"],
+      instructions: compressedData["5"],
+    };
   }
 
-  return {
-    size: ["small", "medium", "large"][compressedData["1"]],
-    sauce: ["tomato", "white", "bbq"][compressedData["2"]],
-    toppings: compressedData["3"],
-    quantity: compressedData["4"],
-    instructions: compressedData["5"],
-  };
+  static compress(originalData: PizzaOrderItem): PizzaOrderItemCompressed {
+    if (!this.validate(originalData)) {
+      throw new Error(
+        "Validation failed: " + this.ajv.errorsText(this.validate.errors),
+      );
+    }
+
+    return {
+      "1": this.SIZE_ENUM.indexOf(originalData.size) as 0 | 1 | 2,
+      "2": this.SAUCE_ENUM.indexOf(originalData.sauce) as 0 | 1 | 2,
+      "3": originalData.toppings,
+      "4": originalData.quantity,
+      "5": originalData.instructions,
+    };
+  }
 }
 ```
 
-On the initial prompt, we send a request to GPT-4 with only the compressed JSON
-schema in the system message.
+## 🍕 Here are details about the generated `PizzaOrderItemUtil` class:
 
-Their wild order here again:
+The `PizzaOrderItemUtil` class serves as a utility in TypeScript for managing
+pizza orders in two formats: a standard representation and a compressed
+representation.
 
-superhans after one of his 5 day benders had a crazy idea to order 1000 pizzas.
-500 only with bbq sauce. 500 with x10 cheese. Jeremy wants 1 with 5 toppings of
-pepperoni, sausage, bacon, ham, and chicken. Mark wants 1 with 3 toppings of
-pepperoni, sausage, and bacon. Super hans called back to trick mark and advised
-to add so many chillis to marks pizza, which they argued about, but mark
-eventually agreed.
+## 📦 Imports
+
+- The class imports **Ajv**, a popular JSON schema validator.
+- Additionally, it imports `addFormats` to extend Ajv with additional format
+  support.
+
+## 📝 Interfaces
+
+- **PizzaOrderItem**: Describes the structure of a standard pizza order with
+  attributes like `size`, `sauce`, `toppings`, `quantity`, and `instructions`.
+- **PizzaOrderItemCompressed**: A compact representation of `PizzaOrderItem`. It
+  optimizes space by using numerical keys and represents attributes like `size`
+  and `sauce` with numbers.
+
+## 🛠 Utility Class Features
+
+### Ajv Initialization
+
+- Initializes the Ajv library with specific configurations for validation
+  purposes.
+
+### Constants
+
+- `SIZE_ENUM` and `SAUCE_ENUM`: Enumerations that define the possible values for
+  the size and sauce of the pizza.
+- `schema` and `compressedSchema`: JSON schemas that define the expected
+  structure for the standard and compressed data formats.
+- `schemaString` and `compressedSchemaString`: Stringified representations of
+  the above schemas.
+
+### 🔄 Conversion Methods
+
+- **decompress**: Converts a compressed pizza order into its standard format.
+  Before decompressing, it ensures the compressed data is valid.
+- **compress**: Converts a standard pizza order into its compressed format. It
+  validates the original data before starting the compression.
+
+### ✅ Validation Methods
+
+- `validate` and `validateCompressed`: Functions generated by Ajv to validate
+  objects against their respective schemas, ensuring data integrity and
+  consistency.
+
+## Here is an example of the 🍕 `PizzaOrderItemUtil` generated class in action:
 
 ```typescript
-export async function getPizzaOrderItemsCompressed(content: string) {
-  const messages = [
-    { role: "system", content: JSON.stringify(compressedSchema) },
-    { role: "user", content },
-  ] as Message[];
+import {
+  PizzaOrderItem,
+  PizzaOrderItemCompressed,
+  PizzaOrderItemUtil,
+} from "./schemas/PizzaOrderItem/PizzaOrderItem.ts";
 
-  const completion = await openai.chat.completions.create({
-    messages: messages,
-    model: "gpt-4",
-    max_tokens: 1000,
-    temperature: 0,
-  });
+// Creating an original PizzaOrderItem
+const originalOrder: PizzaOrderItem = {
+  size: "large",
+  sauce: "bbq",
+  toppings: ["pepperoni", "mushrooms", "onions"],
+  quantity: 2,
+  instructions: "Extra crispy crust, please!",
+};
 
-  console.log(completion.choices[0].message?.content);
+// Printing the original order
+console.log("Original Order:", originalOrder);
 
-  const messageContent = completion.choices[0].message?.content;
+// Compressing the order
+const compressedOrder: PizzaOrderItemCompressed = PizzaOrderItemUtil.compress(
+  originalOrder,
+);
+console.log("Compressed Order:", compressedOrder);
 
-  return messageContent;
+// Decompressing the order back to its original form
+const decompressedOrder: PizzaOrderItem = PizzaOrderItemUtil.decompress(
+  compressedOrder,
+);
+console.log("Decompressed Order:", decompressedOrder);
+
+// Validation of the original order
+const isValidOriginal = PizzaOrderItemUtil.validate(originalOrder);
+console.log("Is Original Order Valid?", isValidOriginal ? "Yes" : "No");
+
+// Validation of the compressed order
+const isValidCompressed = PizzaOrderItemUtil.validateCompressed(
+  compressedOrder,
+);
+console.log("Is Compressed Order Valid?", isValidCompressed ? "Yes" : "No");
+
+// Example of a compressed order
+const predefinedCompressedOrder: PizzaOrderItemCompressed = {
+  "1": 1,
+  "2": 1,
+  "3": ["olives", "spinach", "feta cheese"],
+  "4": 1,
+  "5": "Well done with extra cheese on top.",
+};
+console.log("Compressed:", predefinedCompressedOrder);
+
+// Decompressing the predefined compressed order should output:
+// {
+//    "size": "medium",
+//    "sauce": "white",
+//    "toppings": ["olives", "spinach", "feta cheese"],
+//    "quantity": 1,
+//    "instructions": "Well done with extra cheese on top."
+// }
+const decompressedPredefinedOrder: PizzaOrderItem = PizzaOrderItemUtil
+  .decompress(predefinedCompressedOrder);
+console.log("Decompressed:", decompressedPredefinedOrder);
+
+// Get original JSON schema string
+const originalSchemaString = PizzaOrderItemUtil.schemaString;
+console.log("Original Schema:", originalSchemaString);
+
+// Get compressed JSON schema string
+const compressedSchemaString = PizzaOrderItemUtil.compressedSchemaString;
+console.log("Compressed Schema:", compressedSchemaString);
+```
+
+> 📝 **Note**: Your input schemas must validate against this meta JSON schema
+> otherwise the tool will throw an error:
+
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "MetaSchema",
+  "description": "Meta-Schema for validating schemas",
+  "type": "object",
+  "properties": {
+    "$id": {
+      "type": "string"
+    },
+    "$schema": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["object"]
+    },
+    "description": {
+      "type": "string"
+    },
+    "properties": {
+      "type": "object",
+      "patternProperties": {
+        ".*": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["string", "number", "array"]
+            },
+            "description": {
+              "type": "string"
+            },
+            "default": {
+              "type": ["string", "number", "array"]
+            },
+            "enum": {
+              "type": "array",
+              "items": {
+                "type": ["string", "number"]
+              }
+            },
+            "minimum": {
+              "type": "number"
+            }
+          },
+          "required": ["type", "description", "default"],
+          "additionalProperties": false
+        }
+      }
+    },
+    "required": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": ["$id", "type", "description", "properties", "required"],
+  "additionalProperties": false
 }
 ```
 
-output from GPT-4
+## Getting Started 🛠️
 
-```json
-[
-  { "1": 1, "2": 2, "3": [], "4": 500, "5": "null" },
-  { "1": 1, "2": 0, "3": ["cheese"], "4": 500, "5": "null" },
-  {
-    "1": 1,
-    "2": 0,
-    "3": ["pepperoni", "sausage", "bacon", "ham", "chicken"],
-    "4": 1,
-    "5": "null"
-  },
-  {
-    "1": 1,
-    "2": 0,
-    "3": ["pepperoni", "sausage", "bacon", "chilli"],
-    "4": 1,
-    "5": "null"
-  }
-]
+- Ensure Deno is installed.
+- Clone this repository.
+- Create a folder in the Schemas directory with the same name as the $id
+  property of your schema.
+- Add your schema to the folder. It must be called schema.json.
+
+```bash
+deno task update
 ```
 
-The compressed JSON received is then validated in its compressed state and
-decompressed if it validates
+This will then regenerate all the utility classes for your schemas.
 
-```typescript
-export function decompressData(
-  compressedData: PizzaOrderItemCompressed,
-): PizzaOrderItem {
-  if (!validate(compressedData)) {
-    throw new Error("Validation failed: " + ajv.errorsText(validate.errors));
-  }
+## Feedback & Contributions 🤝
 
-  return {
-    size: ["small", "medium", "large"][compressedData["1"]],
-    sauce: ["tomato", "white", "bbq"][compressedData["2"]],
-    toppings: compressedData["3"],
-    quantity: compressedData["4"],
-    instructions: compressedData["5"],
-  };
-}
-```
+Feel free to open issues or pull requests if you have suggestions or find any
+bugs. Any feedback is appreciated!
 
-output
+## License 📄
 
-```json
-[
-  {
-    "size": "medium",
-    "sauce": "bbq",
-    "toppings": [],
-    "quantity": 500,
-    "instructions": "null"
-  },
-  {
-    "size": "medium",
-    "sauce": "tomato",
-    "toppings": [
-      "cheese"
-    ],
-    "quantity": 500,
-    "instructions": "null"
-  },
-  {
-    "size": "medium",
-    "sauce": "tomato",
-    "toppings": [
-      "pepperoni",
-      "sausage",
-      "bacon",
-      "ham",
-      "chicken"
-    ],
-    "quantity": 1,
-    "instructions": "null"
-  },
-  {
-    "size": "medium",
-    "sauce": "tomato",
-    "toppings": [
-      "pepperoni",
-      "sausage",
-      "bacon",
-      "chilli"
-    ],
-    "quantity": 1,
-    "instructions": "null"
-  }
-]
-```
+This project is licensed under the MIT License.
 
-As we have already validated before decompressing, there is no requirement to
-validate again.
-
-With this structured validated output, you can now use it either programatically
-or pass back into the AI to do something else (generating the story with context
-about the order)
-
-I've tested passing the compressed schema back into the system prompt and then
-for further actions, passing the compressed JSON outputs, and it seems to work.
-But again this is just for fun.
-
-Examples of how the outputs could be used in the context of this pizza order:
-
-- Send a static table to the user in the chat interface showing the order and
-  asking them if its correct. If not, configure a chain/tool to correct the
-  schema based on newer information.
-
-- Prompt a user to select if the bot got it correct the first time based on the
-  confirming the validated data if yes, then store these in something like
-  https://deno.com/kv to use for fine-tuning the OpenAI models.
+---
