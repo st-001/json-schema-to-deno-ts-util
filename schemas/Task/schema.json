@@ -1,0 +1,29 @@
+{
+  "$id": "Task",
+  "type": "object",
+  "description": "A task",
+  "properties": {
+    "task": {
+      "type": "string",
+      "description": "The task name",
+      "enum": [
+        "sendEmail",
+        "sendTeamsMessage",
+        "scheduleMeeting",
+        "getCustomer",
+        "getEmployee",
+        "sendWhatsAppMessage"
+      ],
+      "default": ""
+    },
+    "taskDetails": {
+      "type": "string",
+      "description": "All details required to complete the task",
+      "default": ""
+    }
+  },
+  "required": [
+    "task",
+    "taskDetails"
+  ]
+}
