@@ -13,9 +13,8 @@ expand it to support more features.
 
 ## Features ✨
 
-- **Automatic Type Generation**: From basic types to enums, get precisely
-  defined Typescript interfaces for the compressed and uncompressed versions of
-  your data.
+- **Automatic Type Generation**: Typescript interfaces for the compressed and
+  uncompressed versions of your data.
 - **Compression & Decompression**: Efficiently store and retrieve data with
   compressed schema support.
 - **Validation**: Built-in data validation using Ajv ensures your data adheres
