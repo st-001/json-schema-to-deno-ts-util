@@ -20,8 +20,8 @@ expand it to support more features.
   compressed schema support.
 - **Validation**: Built-in data validation using Ajv ensures your data adheres
   to the schema.
-- **Reuseability**: Once generated, the utility classes can be used in other
-  Deno projects.
+- **Reusability**: Once generated, the utility classes can be used in other Deno
+  projects.
 
 ## Example 🚀
 
