@@ -63,23 +63,27 @@ function mapEnum(
   return { enumMapping, modifiedProp: compressedProp };
 }
 
+function propertyToInterfaceLine(key: string, prop: SchemaProperty): string {
+  let type;
+
+  if (prop.type === "array") {
+    type = `${prop.items!.type}[]`;
+  } else if (prop.enum) {
+    type = prop.enum.map((value) =>
+      typeof value === "string" ? `"${value}"` : value
+    ).join(" | ");
+  } else {
+    type = prop.type;
+  }
+
+  return `  ${key}: ${type};\n`;
+}
+
 function generateTypeDefinitionInterface(schema: Schema): string {
   let interface_ = `export interface ${schema.$id} {\n`;
 
   for (const [key, prop] of Object.entries(schema.properties)) {
-    let type;
-
-    if (prop.type === "array") {
-      type = `${prop.items!.type}[]`;
-    } else if (prop.enum) {
-      type = prop.enum.map((value) =>
-        typeof value === "string" ? `"${value}"` : value
-      ).join(" | ");
-    } else {
-      type = prop.type;
-    }
-
-    interface_ += `  ${key}: ${type};\n`;
+    interface_ += propertyToInterfaceLine(key, prop);
   }
 
   interface_ += "}";
@@ -137,6 +141,30 @@ function generateDecompressionLogic(
   }
 
   return decompressionLogic;
+}
+
+function generateCompressionLogic(
+  originalProp: SchemaProperty,
+  key: string,
+  mapping: { property: string; enums?: { [index: number]: string | number } },
+): string {
+  let compressionLogic = `    "${key}": `;
+
+  if (originalProp.type === "array" && originalProp.enum) {
+    const enumConstantName = `this.${mapping.property.toUpperCase()}_ENUM`;
+    compressionLogic += `originalData.${mapping.property}.map((v: ${
+      originalProp.items!.type
+    }) => ${enumConstantName}.indexOf(v)),\n`;
+  } else if (mapping.enums) {
+    const enumConstantName = `this.${mapping.property.toUpperCase()}_ENUM`;
+    const enumTypes = Object.keys(mapping.enums).map((idx) => idx).join(" | ");
+    compressionLogic +=
+      `${enumConstantName}.indexOf(originalData.${mapping.property}) as ${enumTypes},\n`;
+  } else {
+    compressionLogic += `originalData.${mapping.property},\n`;
+  }
+
+  return compressionLogic;
 }
 
 function compressSchema(schema: Schema): [Schema, MappingTable] {
@@ -237,6 +265,27 @@ function generateCode(
 
   // Close the class definition
   code += functionBody;
+
+  // Add the compressData function as a static method
+  let compressFunctionBody =
+    `  static compress(originalData: ${originalSchema.$id}): ${originalSchema.$id}Compressed {\n`;
+  compressFunctionBody += `    if (!this.validate(originalData)) {\n`;
+  compressFunctionBody +=
+    `      throw new Error("Validation failed: " + this.ajv.errorsText(this.validate.errors));\n`;
+  compressFunctionBody += `    }\n\n    return {\n`;
+  for (const [key, mapping] of Object.entries(mappingTable)) {
+    const originalProp = originalSchema.properties[mapping.property];
+    compressFunctionBody += generateCompressionLogic(
+      originalProp,
+      key,
+      mapping,
+    );
+  }
+  compressFunctionBody += "    };\n";
+  compressFunctionBody += "  }\n";
+
+  // Add the compressFunctionBody to the generated code
+  code += compressFunctionBody;
   code += "}\n\n";
 
   return code;

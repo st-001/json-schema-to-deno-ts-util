@@ -11,7 +11,7 @@
         2,
         3
       ],
-      "default": 0
+      "default": 1
     },
     "randomWord": {
       "type": "string",
