@@ -12,9 +12,10 @@
         "scheduleMeeting",
         "getCustomer",
         "getEmployee",
-        "sendWhatsAppMessage"
+        "sendWhatsAppMessage",
+        "unknown"
       ],
-      "default": ""
+      "default": "unknown"
     },
     "taskDetails": {
       "type": "string",

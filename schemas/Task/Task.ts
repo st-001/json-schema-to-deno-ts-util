@@ -12,11 +12,13 @@ export interface Task {
     | "sendTeamsMessage"
     | "scheduleMeeting"
     | "getCustomer"
-    | "getEmployee";
+    | "getEmployee"
+    | "sendWhatsAppMessage"
+    | "unknown";
   taskDetails: string;
 }
 export interface TaskCompressed {
-  1: 0 | 1 | 2 | 3 | 4;
+  1: 0 | 1 | 2 | 3 | 4 | 5 | 6;
   2: string;
 }
 export class TaskUtil {
@@ -31,6 +33,8 @@ export class TaskUtil {
     "scheduleMeeting",
     "getCustomer",
     "getEmployee",
+    "sendWhatsAppMessage",
+    "unknown",
   ] as const;
 
   static readonly schema = Object.freeze(
@@ -48,8 +52,10 @@ export class TaskUtil {
             "scheduleMeeting",
             "getCustomer",
             "getEmployee",
+            "sendWhatsAppMessage",
+            "unknown",
           ],
-          "default": "",
+          "default": "unknown",
         },
         "taskDetails": {
           "type": "string",
@@ -73,15 +79,17 @@ export class TaskUtil {
         "1": {
           "type": "number",
           "description":
-            "The task name Enum mapping: 0 = sendEmail, 1 = sendTeamsMessage, 2 = scheduleMeeting, 3 = getCustomer, 4 = getEmployee.",
+            "The task name Enum mapping: 0 = sendEmail, 1 = sendTeamsMessage, 2 = scheduleMeeting, 3 = getCustomer, 4 = getEmployee, 5 = sendWhatsAppMessage, 6 = unknown.",
           "enum": [
             0,
             1,
             2,
             3,
             4,
+            5,
+            6,
           ],
-          "default": -1,
+          "default": 6,
         },
         "2": {
           "type": "string",
@@ -98,10 +106,10 @@ export class TaskUtil {
   );
 
   static readonly schemaString =
-    '{"$id":"Task","type":"object","description":"A task","properties":{"task":{"type":"string","description":"The task name","enum":["sendEmail","sendTeamsMessage","scheduleMeeting","getCustomer","getEmployee"],"default":""},"taskDetails":{"type":"string","description":"All details required to complete the task","default":""}},"required":["task","taskDetails"]}' as const;
+    '{"$id":"Task","type":"object","description":"A task","properties":{"task":{"type":"string","description":"The task name","enum":["sendEmail","sendTeamsMessage","scheduleMeeting","getCustomer","getEmployee","sendWhatsAppMessage","unknown"],"default":"unknown"},"taskDetails":{"type":"string","description":"All details required to complete the task","default":""}},"required":["task","taskDetails"]}' as const;
 
   static readonly compressedSchemaString =
-    '{"$id":"TaskCompressed","type":"object","description":"A task","properties":{"1":{"type":"number","description":"The task name Enum mapping: 0 = sendEmail, 1 = sendTeamsMessage, 2 = scheduleMeeting, 3 = getCustomer, 4 = getEmployee.","enum":[0,1,2,3,4],"default":-1},"2":{"type":"string","description":"All details required to complete the task","default":""}},"required":["1","2"],"additionalProperties":false}' as const;
+    '{"$id":"TaskCompressed","type":"object","description":"A task","properties":{"1":{"type":"number","description":"The task name Enum mapping: 0 = sendEmail, 1 = sendTeamsMessage, 2 = scheduleMeeting, 3 = getCustomer, 4 = getEmployee, 5 = sendWhatsAppMessage, 6 = unknown.","enum":[0,1,2,3,4,5,6],"default":6},"2":{"type":"string","description":"All details required to complete the task","default":""}},"required":["1","2"],"additionalProperties":false}' as const;
 
   static validate = this.ajv.compile(this.schema);
   static validateCompressed = this.ajv.compile(this.compressedSchema);
