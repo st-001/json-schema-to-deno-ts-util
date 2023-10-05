@@ -75,7 +75,7 @@ expand it to support more features.
 }
 ```
 
-### Generate TypeScript utility class
+### Generated TypeScript utility class
 
 ```typescript
 /**
