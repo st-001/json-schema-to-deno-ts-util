@@ -460,7 +460,7 @@ console.log("Compressed Schema:", compressedSchemaString);
 
 - Ensure Deno is installed.
 - Clone this repository.
-- Create a folder in the Schemas directory with the same name as the $id
+- Create a folder in the schemas directory with the same name as the $id
   property of your schema.
 - Add your schema to the folder. It must be called schema.json.
 
@@ -478,5 +478,3 @@ bugs. Any feedback is appreciated!
 ## License 📄
 
 This project is licensed under the MIT License.
-
----
