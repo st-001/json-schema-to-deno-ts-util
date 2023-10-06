@@ -15,8 +15,7 @@ expand it to support more features.
 
 - **Automatic Type Generation**: Typescript interfaces for the compressed and
   uncompressed versions of your data.
-- **Compression & Decompression**: Efficiently store and retrieve data with
-  compressed schema support.
+- **Compression & Decompression**: Compress and decompress your data.
 - **Validation**: Built-in data validation using Ajv ensures your data adheres
   to the schema.
 - **Reusability**: Once generated, the utility classes can be used in other Deno
