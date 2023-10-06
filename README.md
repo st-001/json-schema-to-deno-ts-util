@@ -11,7 +11,7 @@ expand it to support more features.
 > validate the output received and save on token cost. There are most likely
 > bugs. Any feedback is much appreciated!**
 
-## Features ✨
+## Features
 
 - **Automatic Type Generation**: Typescript interfaces for the compressed and
   uncompressed versions of your data.
@@ -21,7 +21,7 @@ expand it to support more features.
 - **Reusability**: Once generated, the utility classes can be used in other Deno
   projects.
 
-## Example 🚀
+## Example
 
 ### Input JSON schema
 
@@ -454,7 +454,7 @@ console.log("Compressed Schema:", compressedSchemaString);
 }
 ```
 
-## Getting Started 🛠️
+## Getting Started
 
 - Ensure Deno is installed.
 - Clone this repository.
@@ -468,11 +468,11 @@ deno task update
 
 This will then regenerate all the utility classes for your schemas.
 
-## Feedback & Contributions 🤝
+## Feedback & Contributions
 
 Feel free to open issues or pull requests if you have suggestions or find any
 bugs. Any feedback is appreciated!
 
-## License 📄
+## License
 
 This project is licensed under the MIT License.
