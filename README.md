@@ -448,6 +448,16 @@ console.log("Compressed Schema:", compressedSchemaString);
                 "type": ["string", "number"]
               }
             },
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": ["string", "number"]
+                }
+              },
+              "required": ["type"]
+            },
             "minimum": {
               "type": "number"
             }
