@@ -21,6 +21,21 @@ expand it to support more features.
 - **Reusability**: Once generated, the utility classes can be used in other Deno
   projects.
 
+## Usage
+
+- Ensure Deno is installed.
+- Clone this repository.
+- Create a folder in the schemas directory with the same name as the $id
+  property of your schema.
+- Add your schema to the folder. It must be called schema.json.
+- Run:
+
+```bash
+deno task update
+```
+
+This will then regenerate all the utility classes for your schemas.
+
 ## Example
 
 ### Input JSON schema
@@ -453,20 +468,6 @@ console.log("Compressed Schema:", compressedSchemaString);
   "additionalProperties": false
 }
 ```
-
-## Getting Started
-
-- Ensure Deno is installed.
-- Clone this repository.
-- Create a folder in the schemas directory with the same name as the $id
-  property of your schema.
-- Add your schema to the folder. It must be called schema.json.
-
-```bash
-deno task update
-```
-
-This will then regenerate all the utility classes for your schemas.
 
 ## Feedback & Contributions
 
