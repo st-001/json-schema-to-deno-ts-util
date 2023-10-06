@@ -34,7 +34,7 @@ expand it to support more features.
 deno task update
 ```
 
-This will then regenerate all the utility classes for your schemas.
+This will then generate/regenerate all the utility classes for your schemas.
 
 ## Example
 
